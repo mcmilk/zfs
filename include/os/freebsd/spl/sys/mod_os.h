@@ -88,6 +88,9 @@
 #define	fletcher_4_param_set_args(var) \
     CTLTYPE_STRING, NULL, 0, fletcher_4_param, "A"
 
+#define	icp_blake3_impl_set_args(var) \
+    CTLTYPE_STRING, NULL, 0, icp_blake3_impl_param, "A"
+
 #include <sys/kernel.h>
 #define	module_init(fn) \
 static void \

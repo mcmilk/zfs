@@ -49,6 +49,7 @@ typedef struct kernel_param zfs_kernel_param_t;
 #define	STRING charp
 
 enum scope_prefix_types {
+	icp,
 	zfs,
 	zfs_arc,
 	zfs_condense,

@@ -202,6 +202,7 @@ blake3_impl_get_ops(void)
 }
 
 #if defined(_KERNEL)
+
 void **blake3_per_cpu_ctx;
 
 void
@@ -227,9 +228,13 @@ blake3_per_cpu_ctx_fini(void)
 	memset(blake3_per_cpu_ctx, 0, max_ncpus * sizeof (void *));
 	kmem_free(blake3_per_cpu_ctx, max_ncpus * sizeof (void *));
 }
-#endif
 
-#if defined(_KERNEL) && defined(__linux__)
+#define	IMPL_FMT(impl, i)	(((impl) == (i)) ? "[%s] " : "%s ")
+
+#if defined(__linux__)
+
+#define	ICP_SCOPE	icp
+
 static int
 icp_blake3_impl_set(const char *name, zfs_kernel_param_t *kp)
 {
@@ -253,22 +258,23 @@ icp_blake3_impl_set(const char *name, zfs_kernel_param_t *kp)
 static int
 icp_blake3_impl_get(char *buffer, zfs_kernel_param_t *kp)
 {
+	const uint32_t impl = IMPL_READ(icp_blake3_impl);
 	int i, cid, cnt = 0;
 	char *fmt;
 
 	/* cycling */
-	fmt = (icp_blake3_impl == IMPL_CYCLE) ? "[cycle] " : "cycle ";
-	cnt += sprintf(buffer + cnt, fmt);
+	fmt = IMPL_FMT(impl, IMPL_CYCLE);
+	cnt += sprintf(buffer + cnt, fmt, "cycle");
 
 	/* fastest one */
-	fmt = (icp_blake3_impl == IMPL_FASTEST) ? "[fastest] " : "fastest ";
-	cnt += sprintf(buffer + cnt, fmt);
+	fmt = IMPL_FMT(impl, IMPL_FASTEST);
+	cnt += sprintf(buffer + cnt, fmt, "fastest");
 
 	/* user selected */
 	for (i = 0, cid = 0; i < ARRAY_SIZE(blake3_impls); i++) {
 		if (!blake3_impls[i]->is_supported()) continue;
-		fmt = (icp_blake3_impl == IMPL_USER &&
-		    cid == blake3_current_id) ? "[%s] " : "%s ";
+		fmt = cid != blake3_current_id ? "%s " :
+		    IMPL_FMT(impl, IMPL_USER);
 		cnt += sprintf(buffer + cnt, fmt, blake3_impls[i]->name);
 		cid++;
 	}
@@ -278,7 +284,71 @@ icp_blake3_impl_get(char *buffer, zfs_kernel_param_t *kp)
 	return (cnt);
 }
 
-module_param_call(icp_blake3_impl, icp_blake3_impl_set, icp_blake3_impl_get,
-    NULL, 0644);
-MODULE_PARM_DESC(icp_blake3_impl, "Select BLAKE3 implementation.");
+#else
+
+#include <sys/sbuf.h>
+
+#define	ICP_SCOPE	zfs
+
+static int
+icp_blake3_impl_param(ZFS_MODULE_PARAM_ARGS)
+{
+	int err;
+
+	if (req->newptr == NULL) {
+		const uint32_t impl = IMPL_READ(icp_blake3_impl);
+		const int init_buflen = 64;
+		const char *fmt;
+		struct sbuf *s;
+
+		s = sbuf_new_for_sysctl(NULL, NULL, init_buflen, req);
+
+		/* cycling */
+		fmt = IMPL_FMT(impl, IMPL_CYCLE);
+		(void) sbuf_printf(s, fmt, "cycle");
+
+		/* fastest one */
+		fmt = IMPL_FMT(impl, IMPL_FASTEST);
+		(void) sbuf_printf(s, fmt, "fastest");
+
+		/* user selected */
+		for (int i = 0, cid = 0; i < ARRAY_SIZE(blake3_impls); i++) {
+			if (!blake3_impls[i]->is_supported()) continue;
+			fmt = cid != blake3_current_id ? "%s " :
+			    IMPL_FMT(impl, IMPL_USER);
+			(void) sbuf_printf(s, fmt, blake3_impls[i]->name);
+			cid++;
+		}
+
+		err = sbuf_finish(s);
+		sbuf_delete(s);
+
+		return (err);
+	}
+
+	char buf[16];
+
+	err = sysctl_handle_string(oidp, buf, sizeof (buf), req);
+	if (err)
+		return (err);
+	atomic_swap_32(&icp_blake3_impl, IMPL_PARAM);
+	return (-blake3_set_impl_name(buf));
+}
+
+#endif
+
+#undef IMPL_FMT
+
+/*
+ * This extra macro is needed to expand ICP_SCOPE before the token pasting in
+ * ZFS_MODULE_VIRTUAL_PARAM_CALL() occurs.  There is no icp module on FreeBSD,
+ * so the scope is defined as zfs instead of icp.
+ */
+#define	BLAKE3_IMPL_MODULE_PARAM(scope) \
+    ZFS_MODULE_VIRTUAL_PARAM_CALL(scope, icp_, blake3_impl, \
+        icp_blake3_impl_set, icp_blake3_impl_get, ZMOD_RW, \
+        "Select BLAKE3 implementation.")
+
+BLAKE3_IMPL_MODULE_PARAM(ICP_SCOPE);
+
 #endif
