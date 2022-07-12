@@ -155,7 +155,7 @@ blake3_set_impl_name(const char *name)
 	for (i = 0, cid = 0; i < ARRAY_SIZE(blake3_impls); i++) {
 		if (!blake3_impls[i]->is_supported()) continue;
 		if (strcmp(name, blake3_impls[i]->name) == 0) {
-			if (icp_blake3_impl == IMPL_PARAM) {
+			if (IMPL_READ(icp_blake3_impl) == IMPL_PARAM) {
 				blake3_param_id = cid;
 				return (0);
 			}
@@ -195,7 +195,7 @@ const blake3_impl_ops_t *
 blake3_impl_get_ops(void)
 {
 	/* each call to ops will cycle */
-	if (icp_blake3_impl == IMPL_CYCLE)
+	if (IMPL_READ(icp_blake3_impl) == IMPL_CYCLE)
 		blake3_set_impl_id(IMPL_CYCLE);
 
 	return (blake3_selected_impl);
