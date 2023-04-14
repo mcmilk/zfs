@@ -20,7 +20,7 @@
  */
 
 /*
- * Copyright (c) 2021 Tino Reichardt <milky-zfs@mcmilk.de>
+ * Copyright (c) 2021,2023 Tino Reichardt <milky-zfs@mcmilk.de>
  */
 
 #ifndef	_ZFS_CHKSUM_H
@@ -37,8 +37,13 @@
 extern "C" {
 #endif
 
-/* Benchmark the chksums of ZFS when the module is loading */
+/* checksum benchmark while module is loading (only 64k test) */
 void chksum_init(void);
+
+/* refresh checksum benchmark (complete run) */
+void chksum_refresh(void);
+
+/* deinit checksum benchmark resources */
 void chksum_fini(void);
 
 #ifdef	__cplusplus
