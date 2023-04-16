@@ -1,0 +1,54 @@
+
+# Runners @ Oregon State University Open Source Lab
+# Thanks a lot Lance Albertson
+#
+# The workflow must be changed a bit ... but it works ;)
+# /TR 2022-04-20
+name: osuosl
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testings-linux:
+    name: Linux testings
+    strategy:
+      fail-fast: false
+      matrix:
+        runners: [ arm64-centos-7, arm64-debian-10, arm64-debian-11, arm64-fedora-36, arm64-ubuntu-22, ppc64-centos-7, ppc64le-almalinux-8, ppc64le-almalinux-9, ppc64le-centos-7, ppc64le-debian-11, ppc64le-ubuntu-22 ]
+    runs-on: ${{ matrix.runners }}
+    steps:
+    - name: Run some commands
+      timeout-minutes: 2
+      shell: bash
+      run: |
+        echo "uname -a"
+        uname -a
+        echo "cat /proc/cpuinfo"
+        cat /proc/cpuinfo
+    - name: Cleanup
+      timeout-minutes: 1
+      if: always()
+      run: |
+        ${{ secrets.REBUILD_REQUEST }} runner=$HOSTNAME
+
+  testings-freebsd:
+    name: FreeBSD testings
+    strategy:
+      fail-fast: false
+      matrix:
+        runners: [ arm64-freebsd-13 ]
+    runs-on: ${{ matrix.runners }}
+    steps:
+    - name: Run some commands
+      timeout-minutes: 2
+      shell: bash
+      run: |
+        echo "uname -a"
+        uname -a
+    - name: Cleanup
+      timeout-minutes: 1
+      if: always()
+      run: |
+        ${{ secrets.REBUILD_REQUEST }} runner=$HOSTNAME
