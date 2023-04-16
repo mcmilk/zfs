@@ -1,0 +1,96 @@
+######################################################################
+# Runners @ Oregon State University Open Source Lab
+# Thanks a lot Lance Albertson
+######################################################################
+#
+#                 amd64  arm64 ppc64le ppc64
+# -------------------------------------------
+#  1 almalinux-8   [x]    [x]    [x]    [ ]
+#  2 almalinux-9   [x]    [x]    [x]    [ ]
+#  3 centos-8      [x]    [x]    [x]    [ ]
+#  4 debian-11     [x]    [x]    [x]    [ ]
+#  5 debian-12     [x]    [x]    [x]    [ ]
+#  6 fedora-36     [x]    [x]    [ ]    [ ]
+#  7 fedora-37     [x]    [x]    [x]    [ ]
+#  8 fedora-38     [x]    [x]    [x]    [ ]
+#  9 ubuntu-22     [x]    [x]    [x]    [ ]
+# 10 freebsd-12    [x]    [x]    [ ]    [ ]
+# 11 freebsd-13    [x]    [x]    [x]    [x]
+# 12 freebsd-14    [x]    [x]    [x]    [x]
+# -------------------------------------------
+#                  12     12     10      2
+######################################################################
+
+name: osuosl
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  osuosl:
+    name: Full testings
+    strategy:
+      fail-fast: false
+      matrix:
+        runners:
+        - amd64-almalinux-8
+        - amd64-almalinux-9
+        - amd64-centos-8
+        - amd64-fedora-36
+        - amd64-fedora-37
+        - amd64-fedora-38
+        - amd64-debian-11
+        - amd64-debian-12
+        - amd64-ubuntu-22
+        - amd64-freebsd-12
+        - amd64-freebsd-13
+        - amd64-freebsd-14
+        - arm64-almalinux-8
+        - arm64-almalinux-9
+        - arm64-centos-8
+        - arm64-fedora-36
+        - arm64-fedora-37
+        - arm64-fedora-38
+        - arm64-debian-11
+        - arm64-debian-12
+        - arm64-ubuntu-22
+        - arm64-freebsd-13
+        - arm64-freebsd-14
+        - ppc64le-almalinux-8
+        - ppc64le-almalinux-9
+        - ppc64le-centos-8
+        - ppc64le-fedora-37
+        - ppc64le-fedora-38
+        - ppc64le-debian-11
+        - ppc64le-debian-12
+        - ppc64le-ubuntu-22
+    runs-on: ${{ matrix.runners }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: System information
+      run: |
+        uname -a
+        which lscpu && lscpu
+    - name: Install dependencies
+      run: |
+        ln -s ${{ github.workspace }} /home/runner/work
+        .github/workflows/selfhosted/01_prepare.sh
+    - name: Configure and build
+      run: |
+        .github/workflows/selfhosted/02_build.sh
+    - name: Clear the kernel ring buffer
+      run: |
+        sudo dmesg
+        sudo dmesg -c >/var/tmp/dmesg-prerun
+    - name: Report disk space
+      run: |
+        sudo df -h /
+    - name: Tests
+      run: |
+        .github/workflows/selfhosted/03_testing.sh
