@@ -1,0 +1,38 @@
+name: testing.yml
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  timing-test:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Check timeout-minutes:1 step setting
+      timeout-minutes: 1
+      run: |
+        uname -a
+        for i in `seq 1 60`; do echo "$i"; sleep 1; done
+        echo "one minute over"
+        for i in `seq 1 20`; do echo "$i"; sleep 1; done
+        echo "20 more seconds over"
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "if always() catched!"
+
+  timing-test2:
+    runs-on: amd64-almalinux-8
+    steps:
+    - name: Check timeout-minutes:1 step setting
+      timeout-minutes: 1
+      run: |
+        uname -a
+        for i in `seq 1 60`; do echo "$i"; sleep 1; done
+        echo "one minute over"
+        for i in `seq 1 20`; do echo "$i"; sleep 1; done
+        echo "20 more seconds over"
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "if always() catched!"
