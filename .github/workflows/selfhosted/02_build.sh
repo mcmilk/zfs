@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # prepare -> build -> testing
-set -eu
+# set -eu
 
 function linux() {
   export PATH="$PATH:/sbin:/usr/sbin:/usr/local/sbin"
@@ -12,6 +12,7 @@ function linux() {
 
   echo "##[group]Configure"
   ./configure --enable-debug --enable-debuginfo
+  sleep 9000
   echo "##[endgroup]"
 
   echo "##[group]Build"

@@ -55,7 +55,6 @@ jobs:
     - name: Configure and build
       run: |
         .github/workflows/selfhosted/02_build.sh
-        sleep 9000
     - name: Clear the kernel ring buffer
       run: |
         sudo dmesg
