@@ -26,6 +26,8 @@
 
 #include <sys/types.h>
 #include <sys/simd.h>
+
+struct pt_regs;
 #include <sys/asm_linkage.h>
 
 /* These functions are used to execute pclmulqdq based assembly methods */
