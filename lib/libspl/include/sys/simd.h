@@ -58,8 +58,6 @@ extern unsigned long getauxval(unsigned long type);
 #define	kfpu_allowed()		1
 #define	kfpu_begin()		do {} while (0)
 #define	kfpu_end()		do {} while (0)
-#define	kfpu_init()		0
-#define	kfpu_fini()		((void) 0)
 
 /*
  * CPUID feature tests for user-space.
@@ -481,7 +479,6 @@ zfs_avx512vbmi_available(void)
 #elif defined(__arm__)
 
 #define	kfpu_allowed()		1
-#define	kfpu_initialize(tsk)	do {} while (0)
 #define	kfpu_begin()		do {} while (0)
 #define	kfpu_end()		do {} while (0)
 
@@ -511,7 +508,6 @@ zfs_sha256_available(void)
 #elif defined(__aarch64__)
 
 #define	kfpu_allowed()		1
-#define	kfpu_initialize(tsk)	do {} while (0)
 #define	kfpu_begin()		do {} while (0)
 #define	kfpu_end()		do {} while (0)
 
@@ -552,7 +548,6 @@ zfs_sha512_available(void)
 #elif defined(__powerpc__)
 
 #define	kfpu_allowed()		0
-#define	kfpu_initialize(tsk)	do {} while (0)
 #define	kfpu_begin()		do {} while (0)
 #define	kfpu_end()		do {} while (0)
 
@@ -586,7 +581,6 @@ zfs_isa207_available(void)
 #else
 
 #define	kfpu_allowed()		0
-#define	kfpu_initialize(tsk)	do {} while (0)
 #define	kfpu_begin()		do {} while (0)
 #define	kfpu_end()		do {} while (0)
 

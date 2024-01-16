@@ -27,9 +27,6 @@
 
 
 #ifdef _KERNEL
-#ifdef __linux__
-#include <linux/simd.h>
-#endif /* __linux__ */
 kstat_t *simd_stat_kstat;
 #endif /* _KERNEL */
 
@@ -74,8 +71,6 @@ simd_stat_kstat_data(char *buf, size_t size, void *data)
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "sse2", zfs_sse2_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "sse3", zfs_sse3_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "ssse3", zfs_ssse3_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "sse41", zfs_sse4_1_available());
@@ -88,46 +83,15 @@ simd_stat_kstat_data(char *buf, size_t size, void *data)
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "avx512f", zfs_avx512f_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512cd", zfs_avx512cd_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512er", zfs_avx512er_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512pf", zfs_avx512pf_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "avx512bw", zfs_avx512bw_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512dq", zfs_avx512dq_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "avx512vl", zfs_avx512vl_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512ifma", zfs_avx512ifma_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "avx512vbmi", zfs_avx512vbmi_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "ymm", __ymm_enabled());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "zmm", __zmm_enabled());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "bmi1", zfs_bmi1_available());
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "bmi2", zfs_bmi2_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "aes", zfs_aes_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "pclmulqdq", zfs_pclmulqdq_available());
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
 		    "movbe", zfs_movbe_available());
-
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "osxsave", boot_cpu_has(X86_FEATURE_OSXSAVE));
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "xsaves", static_cpu_has(X86_FEATURE_XSAVES));
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "xsaveopt", static_cpu_has(X86_FEATURE_XSAVEOPT));
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "xsave", static_cpu_has(X86_FEATURE_XSAVE));
-		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,
-		    "fxsr", static_cpu_has(X86_FEATURE_FXSR));
 #endif /* __x86__ */
 #if defined(__arm__) || defined(__aarch64__)
 		off += SIMD_STAT_PRINT(simd_stat_kstat_payload,

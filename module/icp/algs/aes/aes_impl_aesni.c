@@ -26,6 +26,7 @@
 
 #include <sys/simd.h>
 #include <sys/types.h>
+struct pt_regs;
 #include <sys/asm_linkage.h>
 
 /* These functions are used to execute AES-NI instructions: */
