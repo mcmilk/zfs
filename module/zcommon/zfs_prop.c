@@ -1078,10 +1078,6 @@ extern void zcommon_fini(void);
 int __init
 zcommon_init(void)
 {
-	int error = kfpu_init();
-	if (error)
-		return (error);
-
 	fletcher_4_init();
 	simd_stat_init();
 
@@ -1093,7 +1089,6 @@ zcommon_fini(void)
 {
 	simd_stat_fini();
 	fletcher_4_fini();
-	kfpu_fini();
 }
 
 #ifdef __FreeBSD__
