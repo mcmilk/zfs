@@ -1,0 +1,78 @@
+
+#######################################################
+# almalinux8, almalinux9
+# centos-stream8, centos-stream9
+# fedora38, fedora39
+# debian10 debian11, debian12
+# ubuntu22, ubuntu24
+# freebsd13, freebsd14, freebsd15
+#######################################################
+
+name: zfs-qemu-tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  setup-vm:
+    name: Setup
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [almalinux8, almalinux9, centos-stream8, centos-stream9, fedora38, fedora39, debian10, debian11, debian12, freebsd13, freebsd14, freebsd15, ubuntu22, ubuntu24]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Setup SSH
+      run: |
+        mkdir $HOME/.ssh
+        echo "${{ secrets.AUTHORIZED_KEYS }}" > $HOME/.ssh/authorized_keys
+        echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        echo "${{ secrets.KNOWN_HOSTS }}" > $HOME/.ssh/known_hosts
+        chmod 600 $HOME/.ssh/id_ed25519
+        . /usr/share/bash-completion/bash_completion
+        R=`shuf -n 1 -i 20000-30000`
+        echo "SSH Port $R"
+        ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
+    - name: Setup QEMU
+      run: |
+        .github/workflows/scripts/qemu-setup.sh
+    - name: Start runner VM
+      run: |
+        .github/workflows/scripts/qemu-start.sh ${{ matrix.os }} ${{ matrix.os }}-${{ github.ref_name }} ${{ secrets.GHO }} https://github.com/mcmilk/zfs
+    - name: Wait for runner VM
+      run: |
+        echo Waiting for eol of runner ${{ matrix.os }} ...
+        while pidof /usr/bin/qemu-system-x86_64 >/dev/null; do
+          sleep 5
+        done
+
+  testings:
+    name: Testings
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [almalinux8, almalinux9, centos-stream8, centos-stream9, fedora38, fedora39, debian10, debian11, debian12, freebsd13, freebsd14, freebsd15, ubuntu22, ubuntu24]
+    runs-on: ${{ matrix.os }}-${{ github.ref_name }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: System Information
+      run: |
+        echo Running on ${{ matrix.os }}:
+        uname -a
+        echo Disk usage:
+        df -h
+    - name: Install dependencies
+      run: |
+        .github/workflows/scripts/qemu-deps.sh ${{ matrix.os }}
+    - name: Build and install modules
+      run: |
+        .github/workflows/scripts/qemu-build.sh ${{ matrix.os }}
+    - name: Run testings
+      run: |
+        .github/workflows/scripts/qemu-tests.sh ${{ matrix.os }}
