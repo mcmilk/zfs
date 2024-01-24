@@ -12,9 +12,17 @@ REPO="$4"
 # valid ostypes: virt-install --os-variant list
 OSv=$OS
 
+# optional virt-install commands
+OPTS="--cpu host-passthrough"
+
 case "$OS" in
   almalinux8)
     URL="https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
+    ;;
+  almalinux8-aarch64)
+    OPTS="--boot uefi --arch aarch64"
+    URL="https://repo.almalinux.org/almalinux/8/cloud/aarch64/images/AlmaLinux-8-GenericCloud-latest.aarch64.qcow2"
+    OSv="almalinux8"
     ;;
   almalinux9)
     URL="https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
@@ -118,7 +126,8 @@ write_files:
         REL="2.312.0"
         URL="https://github.com/actions/runner/releases"
         while :; do
-          # https://github.com/actions/runner/releases/download/v2.305.0/actions-runner-linux-arm64-2.305.0.tar.gz
+          # https://github.com/actions/runner/releases/download/v2.305.0/actions-runner-linux-x64-2.305.0.tar.gz
+          # https://github.com/actions/runner/releases/download/v2.312.0/actions-runner-linux-arm64-2.312.0.tar.gz
           curl -s -o ghar.tgz -L "\$URL/download/v\$REL/actions-runner-linux-\$1-\$REL.tar.gz"
           [[ \$? == 0 ]] && break
           sleep 5
@@ -143,6 +152,9 @@ write_files:
       }
 
       case $OS in
+      almalinux8-aarch64)
+        download_action_runner "arm64"
+        ;;
       debian*|ubuntu*)
         export DEBIAN_FRONTEND="noninteractive"
         sudo systemctl stop unattended-upgrades
@@ -193,7 +205,7 @@ echo "Starting machine for runner $ID ..."
 sudo virt-install \
   --os-variant $OSv \
   --name "openzfs" \
-  --cpu host-passthrough \
+  $OPTS \
   --vcpus=4,sockets=1 \
   --memory 14336 \
   --graphics none \
@@ -201,5 +213,8 @@ sudo virt-install \
   --cloud-init user-data=/tmp/user-data \
   --disk $DISK,format=qcow2,bus=virtio \
   --import --noautoconsole
+RV=$?
 sudo rm -f /tmp/user-data
-echo "Starting $ID -> result=$?"
+
+echo "Starting $ID -> result=$RV"
+sleep 300000

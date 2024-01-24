@@ -12,7 +12,8 @@ sudo apt-get purge snapd google-chrome-stable firefox
 
 # only install qemu, leave the system as it is
 sudo apt-get update
-sudo apt-get install axel cloud-image-utils guestfs-tools virt-manager
+sudo apt-get install axel cloud-image-utils guestfs-tools \
+  virt-manager qemu-system-aarch64
 sudo dmesg -c > /var/tmp/dmesg-prerun
 
 # generate ssh keys
