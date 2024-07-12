@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         # os: [almalinux8, almalinux9, archlinux, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd14, freebsd15, tumbleweed, ubuntu20, ubuntu22, ubuntu24]
-        os: [almalinux8, almalinux9, fedora39, fedora40, debian11, freebsd13, freebsd14, freebsd15]
+        # os: [almalinux8, almalinux9, fedora39, fedora40, debian11, freebsd13, freebsd14, freebsd15]
         # os: [freebsd13, freebsd14, freebsd15]
-        # os: [almalinux8, almalinux9, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd14, freebsd15, ubuntu20, ubuntu22, ubuntu24]
+        os: [almalinux8, almalinux9, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd14, freebsd15, ubuntu20, ubuntu22, ubuntu24]
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
