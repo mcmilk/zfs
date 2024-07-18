@@ -11,7 +11,7 @@ OS="$1"
 OSv=$OS
 
 # compressed with .zst extension
-FREEBSD="https://github.com/mcmilk/openzfs-freebsd-images/releases/download/v2024-07-16"
+FREEBSD="https://github.com/mcmilk/openzfs-freebsd-images/releases/download/v2024-07-19"
 URLzs=""
 # Ubuntu mirrors
 #UBMIRROR="https://cloud-images.ubuntu.com"
@@ -176,4 +176,5 @@ sudo virt-install \
   --network bridge=virbr0,model=e1000,mac='52:54:00:83:79:00' \
   --cloud-init user-data=/tmp/user-data \
   --disk $DISK,bus=virtio,cache=none,format=qcow2,driver.discard=unmap \
-  --import --noautoconsole >/dev/null
+  --import --noautoconsole
+# >/dev/null

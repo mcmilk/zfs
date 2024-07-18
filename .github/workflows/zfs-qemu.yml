@@ -14,12 +14,26 @@ jobs:
       fail-fast: false
       matrix:
         # os: [almalinux8, almalinux9, archlinux, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd14, freebsd15, ubuntu20, ubuntu22, ubuntu24]
-        os: [almalinux8, almalinux9, fedora39, fedora40, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
+        os: [almalinux8, almalinux9, debian11, debian12, fedora39, fedora40, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
+        # os: [freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Setup SSH
+      run: |
+        mkdir -p $HOME/.ssh
+        echo "ConnectTimeout 1" >> $HOME/.ssh/config
+        echo "StrictHostKeyChecking no" >> $HOME/.ssh/config
+        echo "${{ secrets.AUTHORIZED_KEYS }}" >> $HOME/.ssh/authorized_keys
+        echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        echo "${{ secrets.KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+        chmod 600 $HOME/.ssh/id_ed25519
+        R=`shuf -n 1 -i 10000-60000`
+        echo "Port  $R"
+        ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
 
     - name: Setup QEMU
       timeout-minutes: 10
