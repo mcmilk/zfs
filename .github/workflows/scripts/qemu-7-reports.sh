@@ -38,5 +38,6 @@ for i in `seq 1 3`; do
 done
 
 # all tests without grouping:
+ls -l $MERGE
 $MERGE vm{1,2,3}log.txt | $BASE/scripts/zfs-tests-color.sh
 exit $EXIT
