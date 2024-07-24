@@ -4,10 +4,10 @@
 # 1) setup the action runner to start some qemu instance
 ######################################################################
 
-#set -eu
+set -eu
 
 # speedup virtual disk
-sudo modprobe loop max_loop=1
+sudo modprobe loop
 sudo fallocate -l 50GB /var/blob
 sudo losetup -f /var/blob
 sudo mdadm --create /dev/md/raidzero -n2 -l0 /dev/loop0 /dev/sdb

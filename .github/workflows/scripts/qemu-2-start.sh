@@ -4,7 +4,7 @@
 # 2) start qemu with some operating system, init via cloud-init
 ######################################################################
 
-#set -eu
+set -eu
 
 # valid ostypes: virt-install --os-variant list
 OS="$1"
