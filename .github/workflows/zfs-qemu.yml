@@ -18,7 +18,7 @@ jobs:
         # all:
         # os: [almalinux8, almalinux9, archlinux, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15, ubuntu20, ubuntu22, ubuntu24]
         # openzfs:
-        # os: [almalinux8, almalinux9, debian11, debian12, fedora39, fedora40, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
+        os: [almalinux8, almalinux9, debian11, debian12]
         # freebsd:
         # os: [freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
     runs-on: ppc64le-ubuntu-24
