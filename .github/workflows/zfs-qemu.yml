@@ -20,7 +20,7 @@ jobs:
         # openzfs:
         # os: [almalinux8, almalinux9, debian11, debian12, fedora39, fedora40, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
         # freebsd:
-        # os: [freebsd13, freebsd13r, freebsd14, freebsd14r]
+        # os: [freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4

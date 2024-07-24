@@ -124,8 +124,8 @@ echo "$OSNAME" > /var/tmp/osname.txt
 # 3 -> number of virtual machines used for testings
 echo "$VMs" > /var/tmp/vms.txt
 
-IMG="/mnt/cloudimg.qcow2"
-DISK="/mnt/openzfs.qcow2"
+IMG="/mnt/tests/cloudimg.qcow2"
+DISK="/mnt/tests/openzfs.qcow2"
 sudo chown -R $(whoami) /mnt
 
 if [ ! -z "$URLzs" ]; then
@@ -179,7 +179,7 @@ sudo virt-install \
   --cpu host-passthrough \
   --virt-type=kvm --hvm \
   --vcpus=4,sockets=1 \
-  --memory $((1024*12)) \
+  --memory $((1024*8)) \
   --memballoon model=virtio,autodeflate=on,freePageReporting=on \
   --graphics none \
   --network bridge=virbr0,model=e1000,mac='52:54:00:83:79:00' \

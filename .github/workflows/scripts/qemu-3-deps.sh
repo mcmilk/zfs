@@ -145,9 +145,9 @@ case "$1" in
   freebsd*)
     # add virtio things
     echo 'virtio_load="YES"' | sudo -E tee -a /boot/loader.conf
-    for i in balloon blk pci scsi console; do
-      echo "virtio_${i}_load=\"YES\"" | sudo -E tee -a /boot/loader.conf
-    done
+    #for i in balloon blk pci scsi console; do
+    #  echo "virtio_${i}_load=\"YES\"" | sudo -E tee -a /boot/loader.conf
+    #done
     echo "fdescfs /dev/fd fdescfs rw 0 0" | sudo -E tee -a /etc/fstab
     sudo -E mount /dev/fd
     sudo -E touch /etc/zfs/exports

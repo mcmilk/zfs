@@ -46,6 +46,8 @@ if [ -z $3 ]; then
 
   # kill the tail/sed combo
   killall tail
+  dmesg -c > dmesg-host.txt
+  sleep 1
   exit 0
 fi
 

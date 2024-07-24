@@ -6,9 +6,6 @@
 
 set -eu
 
-CPU="$1"
-RAM="$2"
-
 # wait for poweroff to succeed
 PID=`pidof /usr/bin/qemu-system-x86_64`
 tail --pid=$PID -f /dev/null
@@ -19,11 +16,17 @@ OSv=`cat /var/tmp/osvariant.txt`
 OS=`cat /var/tmp/os.txt`
 VMs=`cat /var/tmp/vms.txt`
 
+CPU="$1"
+RAM="$2"
+BALLOON="model=none"
+#BALLOON="model=virtio,autodeflate=on,freePageReporting=on"
+echo "VMs: ${VMs}x with RAM=$RAM CPU=$CPU BALLOON=$BALLOON"
+
 for i in `seq 1 $VMs`; do
   echo "Generating disk for vm$i ..."
   sudo qemu-img create -q -f qcow2 -F qcow2 \
     -o compression_type=zstd,cluster_size=128k \
-    -b /mnt/openzfs.qcow2 "/mnt/vm$i.qcow2"
+    -b /mnt/tests/openzfs.qcow2 "/mnt/tests/vm$i.qcow2"
 
   cat <<EOF > /tmp/user-data
 #cloud-config
@@ -55,11 +58,11 @@ EOF
     --virt-type=kvm --hvm \
     --vcpus=$CPU,sockets=1 \
     --memory $((1024*RAM)) \
-    --memballoon model=virtio,autodeflate=on,freePageReporting=on \
+    --memballoon $BALLOON \
     --graphics none \
     --cloud-init user-data=/tmp/user-data \
     --network bridge=virbr0,model=e1000,mac="52:54:00:83:79:0$i" \
-    --disk /mnt/vm$i.qcow2,bus=virtio,cache=none,format=qcow2,driver.discard=unmap \
+    --disk /mnt/tests/vm$i.qcow2,bus=virtio,cache=none,format=qcow2,driver.discard=unmap \
     --import --noautoconsole >/dev/null
 done
 
@@ -71,5 +74,9 @@ for i in `seq 1 $VMs`; do
     ssh 2>/dev/null zfs@192.168.122.1$i "uname -a" && break
   done
 done
+
+echo "*/2 * * * * sync; echo 1 > /proc/sys/vm/drop_caches" >> crontab.txt
+sudo crontab crontab.txt
+sudo rm crontab.txt
 
 echo "All $VMs VMs are up now."
