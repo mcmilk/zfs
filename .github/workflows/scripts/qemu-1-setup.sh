@@ -4,7 +4,7 @@
 # 1) setup the action runner to start some qemu instance
 ######################################################################
 
-set -eu
+#set -eu
 
 # Filesystem      Size  Used Avail Use% Mounted on
 # /dev/root        72G   42G   31G  58% /     -> 25GB
@@ -12,8 +12,8 @@ set -eu
 
 # speedup virtual disk
 sudo modprobe loop max_loop=2
-sudo fallocate -l 26GB /var/blob
-sudo fallocate -l 62GB /mnt/blob
+sudo fallocate -l 50GB /var/blob
+sudo fallocate -l 90GB /mnt/blob
 sudo losetup -f /var/blob
 sudo losetup -f /mnt/blob
 sudo mdadm --create /dev/md/raidzero -n2 -l0 /dev/loop{0..1}
@@ -27,9 +27,7 @@ df -h / /mnt /mnt/tests
 # install needed packages
 sudo apt-get update
 sudo apt-get install axel cloud-image-utils daemonize guestfs-tools \
-  ksmtuned virt-manager linux-modules-extra-`uname -r`
-sudo systemctl start ksm
-sudo systemctl start ksmtuned
+  virt-manager linux-modules-extra-`uname -r`
 
 # generate ssh keys
 rm -f ~/.ssh/id_ed25519

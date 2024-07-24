@@ -1,4 +1,4 @@
-name: zfs-qemu
+name: zfs-osuosl
 
 on:
   push:
@@ -9,19 +9,19 @@ jobs:
   qemu-vm:
     name: QEMU
     env:
-      num_vms: 2
+      num_vms: 1
       num_cpu: 3
       num_ram: 8
     strategy:
       fail-fast: false
       matrix:
         # all:
-        os: [almalinux8, almalinux9, archlinux, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15, ubuntu20, ubuntu22, ubuntu24]
+        # os: [almalinux8, almalinux9, archlinux, centos-stream9, fedora39, fedora40, debian11, debian12, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15, ubuntu20, ubuntu22, ubuntu24]
         # openzfs:
         # os: [almalinux8, almalinux9, debian11, debian12, fedora39, fedora40, freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
         # freebsd:
         # os: [freebsd13, freebsd13r, freebsd14, freebsd14r, freebsd15]
-    runs-on: ubuntu-24.04
+    runs-on: ppc64le-ubuntu-24
     steps:
     - uses: actions/checkout@v4
       with:

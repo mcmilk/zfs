@@ -4,7 +4,7 @@
 # 2) start qemu with some operating system, init via cloud-init
 ######################################################################
 
-set -eu
+#set -eu
 
 # valid ostypes: virt-install --os-variant list
 OS="$1"
@@ -23,19 +23,15 @@ UBMIRROR="https://mirror.citrahost.com/ubuntu-cloud-images"
 case "$OS" in
   almalinux8)
     OSNAME="AlmaLinux 8"
-    URL="https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
+    URL="https://repo.almalinux.org/almalinux/8/cloud/ppc64le/images/AlmaLinux-8-GenericCloud-latest.ppc64le.qcow2"
     ;;
   almalinux9)
     OSNAME="AlmaLinux 9"
-    URL="https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
-    ;;
-  archlinux)
-    OSNAME="Archlinux"
-    URL="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+    URL="https://repo.almalinux.org/almalinux/9/cloud/ppc64le/images/AlmaLinux-9-GenericCloud-latest.ppc64le.qcow2"
     ;;
   centos-stream9)
     OSNAME="CentOS Stream 9"
-    URL="https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+    URL="https://cloud.centos.org/centos/9-stream/ppc64le/images/CentOS-Stream-GenericCloud-9-latest.ppc64le.qcow2"
     ;;
   debian11)
     OSNAME="Debian 11"
@@ -44,16 +40,6 @@ case "$OS" in
   debian12)
     OSNAME="Debian 12"
     URL="https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
-    ;;
-  fedora39)
-    OSNAME="Fedora 39"
-    OSv="fedora39"
-    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/39/Cloud/x86_64/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2"
-    ;;
-  fedora40)
-    OSNAME="Fedora 40"
-    OSv="fedora39"
-    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2"
     ;;
   freebsd13)
     OSNAME="FreeBSD 13 (Stable)"
@@ -89,22 +75,22 @@ case "$OS" in
     OSNAME="openSUSE Tumbleweed"
     OSv="opensusetumbleweed"
     MIRROR="http://opensuse-mirror-gce-us.susecloud.net"
-    URL="$MIRROR/tumbleweed/appliances/openSUSE-MicroOS.x86_64-OpenStack-Cloud.qcow2"
+    URL="$MIRROR/tumbleweed/appliances/openSUSE-MicroOS.ppc64le-OpenStack-Cloud.qcow2"
     ;;
   ubuntu20)
     OSNAME="Ubuntu 20.04"
     OSv="ubuntu20.04"
-    URL="$UBMIRROR/focal/current/focal-server-cloudimg-amd64.img"
+    URL="$UBMIRROR/focal/current/focal-server-cloudimg-ppc64el.img"
     ;;
   ubuntu22)
     OSNAME="Ubuntu 22.04"
     OSv="ubuntu22.04"
-    URL="$UBMIRROR/jammy/current/jammy-server-cloudimg-amd64.img"
+    URL="$UBMIRROR/jammy/current/jammy-server-cloudimg-ppc64el.img"
     ;;
   ubuntu24)
     OSNAME="Ubuntu 24.04"
     OSv="ubuntu24.04"
-    URL="$UBMIRROR/noble/current/noble-server-cloudimg-amd64.img"
+    URL="$UBMIRROR/noble/current/noble-server-cloudimg-ppc64el.img"
     ;;
   *)
     echo "Wrong value for variable OS!"
@@ -180,9 +166,11 @@ sudo virt-install \
   --virt-type=kvm --hvm \
   --vcpus=4,sockets=1 \
   --memory $((1024*8)) \
-  --memballoon model=virtio,autodeflate=on,freePageReporting=on \
+  --memballoon model=none \
   --graphics none \
   --network bridge=virbr0,model=e1000,mac='52:54:00:83:79:00' \
   --cloud-init user-data=/tmp/user-data \
   --disk $DISK,bus=virtio,cache=none,format=qcow2,driver.discard=unmap \
   --import --noautoconsole >/dev/null
+
+sleep 21212121
