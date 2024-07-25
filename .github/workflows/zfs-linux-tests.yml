@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tests: [ part1, part2, part3, part4 ]
+        tests: [ "1/4", "2/4", "3/4", "4/4" ]
     steps:
     - uses: actions/checkout@v4
       with:
@@ -101,15 +101,12 @@ jobs:
       run: |
         tar xzf modules-${{ inputs.os }}.tgz
         .github/workflows/scripts/setup-dependencies.sh tests
-    - name: Setup tests
-      run: |
-        .github/workflows/scripts/setup-functional.sh ${{ matrix.tests }} >> $GITHUB_ENV
     - name: Tests
       timeout-minutes: 120
       shell: bash
       run: |
         set -o pipefail
-        /usr/share/zfs/zfs-tests.sh -vKR -s 3G -T ${{ env.TODO }} | scripts/zfs-tests-color.sh
+        /usr/share/zfs/zfs-tests.sh -vKR -s 3G -T ${{ matrix.tests }} | scripts/zfs-tests-color.sh
     - name: Prepare artifacts
       if: success() || failure()
       run: |
