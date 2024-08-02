@@ -62,16 +62,11 @@ function mod_install() {
   sudo swapoff -a
 
   # this one is fast and mounted @ /mnt
-  # -> we reformat with ext4 + move it to /var/tmp
+  # -> lets use it for our tests via /var/tmp
   DEV="/dev/disk/azure/resource-part1"
-  sudo umount /mnt
-  sudo mkfs.ext4 -O ^has_journal -F $DEV
-  sudo mount -o noatime,barrier=0 $DEV /var/tmp
-  sudo chmod 1777 /var/tmp
-
-  # disk usage afterwards
-  sudo df -h /
-  sudo df -h /var/tmp
+  sudo mkdir /mnt/tests
+  sudo chmod 1777 /mnt/tests
+  sudo mount -o bind /mnt/tests /var/tmp
   sudo fstrim -a
   echo "::endgroup::"
 }
