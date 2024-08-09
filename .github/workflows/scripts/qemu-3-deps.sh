@@ -13,8 +13,8 @@ function archlinux() {
 
   echo "##[group]Install Development Tools"
   sudo pacman -Sy --noconfirm base-devel bc cpio dhclient dkms fakeroot \
-    fio gdb inetutils less linux linux-headers lsscsi nfs-utils parted pax \
-    perf python-packaging python-setuptools qemu-guest-agent ksh samba \
+    fio gdb inetutils jq less linux linux-headers lsscsi nfs-utils parted \
+    pax perf python-packaging python-setuptools qemu-guest-agent ksh samba \
     sysstat rng-tools rsync wget
   echo "##[endgroup]"
 }
@@ -30,8 +30,8 @@ function debian() {
   echo "##[group]Install Development Tools"
   sudo apt-get install -y \
     acl alien attr autoconf bc cpio curl dbench dh-python \
-    dkms fakeroot fio gdb gdebi git ksh lcov \
-    isc-dhcp-client libacl1-dev libaio-dev libattr1-dev libblkid-dev \
+    dkms fakeroot fio gdb gdebi git ksh lcov isc-dhcp-client jq \
+    libacl1-dev libaio-dev libattr1-dev libblkid-dev \
     libcurl4-openssl-dev libdevmapper-dev libelf-dev libffi-dev \
     libmount-dev libpam0g-dev libselinux-dev libssl-dev libtool \
     libtool-bin libudev-dev linux-headers-$(uname -r) lsscsi \
@@ -48,7 +48,7 @@ function freebsd() {
 
   echo "##[group]Install Development Tools"
   sudo pkg install -y autoconf automake autotools base64 checkbashisms fio \
-    gdb gettext gettext-runtime git gmake gsed ksh93 lcov libtool lscpu \
+    gdb gettext gettext-runtime git gmake gsed jq ksh93 lcov libtool lscpu \
     pkgconf python python3 pamtester pamtester qemu-guest-agent rsync
   sudo pkg install -xy \
     '^samba4[[:digit:]]+$' \
@@ -70,7 +70,7 @@ function rhel() {
   sudo dnf group install -y "Development Tools"
   sudo dnf install -y \
     acl attr bc bzip2 curl dbench dkms elfutils-libelf-devel fio gdb git \
-    kernel-rpm-macros ksh libacl-devel libaio-devel libargon2-devel \
+    jq kernel-rpm-macros ksh libacl-devel libaio-devel libargon2-devel \
     libattr-devel libblkid-devel libcurl-devel libffi-devel ncompress \
     libselinux-devel libtirpc-devel libtool libudev-devel libuuid-devel \
     lsscsi mdadm nfs-utils openssl-devel pam-devel pamtester parted perf \
