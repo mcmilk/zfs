@@ -25,7 +25,7 @@
 #include "cityhash.h"
 #include "komihash.h"
 
-#if 1
+#if 0
 
 #define	HASH_K1 0xb492b66fbe98f273ULL
 #define	HASH_K2 0x9ae16a3b2f90404fULL
