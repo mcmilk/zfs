@@ -100,7 +100,7 @@ uint64_t
 cityhash1(uint64_t w)
 {
 	komihash_stream_t ctx;
-	void *p1 = &w;
+	const void *p1 = &w;
 
 	komihash_stream_init( &ctx, 0);
 	komihash_stream_update( &ctx, p1, 8);
@@ -111,8 +111,8 @@ uint64_t
 cityhash2(uint64_t w1, uint64_t w2)
 {
 	komihash_stream_t ctx;
-	void *p1 = &w1;
-	void *p2 = &w2;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
 
 	komihash_stream_init( &ctx, 0);
 	komihash_stream_update( &ctx, p1, 8);
@@ -124,9 +124,9 @@ uint64_t
 cityhash3(uint64_t w1, uint64_t w2, uint64_t w3)
 {
 	komihash_stream_t ctx;
-	void *p1 = &w1;
-	void *p2 = &w2;
-	void *p3 = &w3;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
 
 	komihash_stream_init( &ctx, 0);
 	komihash_stream_update( &ctx, p1, 8);
@@ -139,10 +139,10 @@ uint64_t
 cityhash4(uint64_t w1, uint64_t w2, uint64_t w3, uint64_t w4)
 {
 	komihash_stream_t ctx;
-	void *p1 = &w1;
-	void *p2 = &w2;
-	void *p3 = &w3;
-	void *p4 = &w4;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
+	const void *p4 = &w4;
 
 	komihash_stream_init( &ctx, 0);
 	komihash_stream_update( &ctx, p1, 8);
