@@ -245,6 +245,8 @@ ZCOMMON_OBJS := \
 	zpool_prop.o \
 	zprop_common.o
 
+$(obj)/zcommon/cityhash.o : ccflags-y += -O3
+
 ZCOMMON_OBJS_X86 := \
 	zfs_fletcher_avx512.o \
 	zfs_fletcher_intel.o \
