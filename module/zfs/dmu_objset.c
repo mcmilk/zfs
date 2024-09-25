@@ -401,6 +401,7 @@ dmu_objset_byteswap(void *buf, size_t size)
 	}
 }
 
+#if 0
 /*
  * Runs cityhash on the objset_t pointer and the object number.
  */
@@ -409,6 +410,31 @@ dnode_hash(const objset_t *os, uint64_t obj)
 {
 	uintptr_t osv = (uintptr_t)os;
 	return (cityhash2((uint64_t)osv, obj));
+}
+#endif
+
+/*
+ * The hash is a CRC-based hash of the objset_t pointer and the object number.
+ */
+static uint64_t
+dnode_hash(const objset_t *os, uint64_t obj)
+{
+    uintptr_t osv = (uintptr_t)os;
+    uint64_t crc = -1ULL;
+
+    ASSERT(zfs_crc64_table[128] == ZFS_CRC64_POLY);
+    /*
+     * The lower 11 bits of the pointer don't have much entropy, because
+     * the objset_t is more than 1KB long and so likely aligned to 2KB.
+     */
+    crc = (crc >> 8) ^ zfs_crc64_table[(crc ^ (osv >> 11)) & 0xFF];
+    crc = (crc >> 8) ^ zfs_crc64_table[(crc ^ (obj >> 0)) & 0xFF];
+    crc = (crc >> 8) ^ zfs_crc64_table[(crc ^ (obj >> 8)) & 0xFF];
+    crc = (crc >> 8) ^ zfs_crc64_table[(crc ^ (obj >> 16)) & 0xFF];
+
+    crc ^= (osv>>14) ^ (obj>>24);
+
+    return (crc);
 }
 
 static unsigned int

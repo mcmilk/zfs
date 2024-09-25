@@ -78,11 +78,6 @@ static const uint64_t PRIME64_5 =  2870177450012600261ULL;
 /*-**************************
  *  Utils
  ***************************/
-void zfs_xxh64_copy_state(struct zfs_xxh64_state *dst, const struct zfs_xxh64_state *src)
-{
-	memcpy(dst, src, sizeof(*dst));
-}
-
 static uint64_t zfs_xxh64_round(uint64_t acc, const uint64_t input)
 {
 	acc += input * PRIME64_2;
@@ -302,7 +297,6 @@ uint64_t zfs_xxh64_digest(const struct zfs_xxh64_state *state)
 }
 
 #if defined(_KERNEL)
-EXPORT_SYMBOL(zfs_xxh64_copy_state);
 EXPORT_SYMBOL(zfs_xxh64_reset);
 EXPORT_SYMBOL(zfs_xxh64_update);
 EXPORT_SYMBOL(zfs_xxh64_digest);
