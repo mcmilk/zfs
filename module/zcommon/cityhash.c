@@ -27,12 +27,12 @@
 #include "cityhash.h"
 //#define WANT_CITY64
 
-//#include "komihash.h"
-//#define WANT_KOMI
+#include "komihash.h"
+#define WANT_KOMI
 
-#include "xxhash.h"
-#define WANT_XXH64
-#include "xxhash.c"
+//#include "xxhash.h"
+//#define WANT_XXH64
+//#include "xxhash.c"
 
 #ifdef WANT_CITY64
 
