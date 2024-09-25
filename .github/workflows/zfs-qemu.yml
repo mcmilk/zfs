@@ -71,7 +71,7 @@ jobs:
         ssh zfs@$IP '$HOME/zfs/.github/workflows/scripts/qemu-4-build.sh' ${{ matrix.os }}
 
     - name: Setup testing machines
-      timeout-minutes: 5
+      timeout-minutes: 500
       run: |
         .github/workflows/scripts/qemu-5-setup.sh
         sleep 212121
