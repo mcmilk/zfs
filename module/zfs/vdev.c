@@ -3149,9 +3149,9 @@ vdev_dtl_should_excise(vdev_t *vd, boolean_t rebuild_done)
  * Reassess DTLs after a config change or scrub completion. If txg == 0 no
  * write operations will be issued to the pool.
  */
-void
-vdev_dtl_reassess(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
-    boolean_t scrub_done, boolean_t rebuild_done)
+static void
+vdev_dtl_reassess_impl(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
+    boolean_t scrub_done, boolean_t rebuild_done, boolean_t dtl_outage)
 {
 	spa_t *spa = vd->vdev_spa;
 	avl_tree_t reftree;
@@ -3160,8 +3160,8 @@ vdev_dtl_reassess(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
 	ASSERT(spa_config_held(spa, SCL_ALL, RW_READER) != 0);
 
 	for (int c = 0; c < vd->vdev_children; c++)
-		vdev_dtl_reassess(vd->vdev_child[c], txg,
-		    scrub_txg, scrub_done, rebuild_done);
+		vdev_dtl_reassess_impl(vd->vdev_child[c], txg,
+		    scrub_txg, scrub_done, rebuild_done, dtl_outage);
 
 	if (vd == spa->spa_root_vdev || !vdev_is_concrete(vd) || vd->vdev_aux)
 		return;
@@ -3255,7 +3255,15 @@ vdev_dtl_reassess(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
 		if (scrub_done)
 			range_tree_vacate(vd->vdev_dtl[DTL_SCRUB], NULL, NULL);
 		range_tree_vacate(vd->vdev_dtl[DTL_OUTAGE], NULL, NULL);
-		if (!vdev_readable(vd))
+
+		/*
+		 * For the dtl_outage case, treat members of a replacing vdev
+		 * as if they are not available. It's more likely than not that
+		 * a vdev in a replacing vdev could encounter read errors so
+		 * treat it as not being able to contribute.
+		 */
+		if (!vdev_readable(vd) || (dtl_outage &&
+		    vd->vdev_parent->vdev_ops == &vdev_replacing_ops))
 			range_tree_add(vd->vdev_dtl[DTL_OUTAGE], 0, -1ULL);
 		else
 			range_tree_walk(vd->vdev_dtl[DTL_MISSING],
@@ -3319,6 +3327,20 @@ vdev_dtl_reassess(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
 	if (vd->vdev_top->vdev_ops == &vdev_raidz_ops) {
 		raidz_dtl_reassessed(vd);
 	}
+}
+
+void
+vdev_dtl_reassess(vdev_t *vd, uint64_t txg, uint64_t scrub_txg,
+    boolean_t scrub_done, boolean_t rebuild_done)
+{
+	return (vdev_dtl_reassess_impl(vd, txg, scrub_txg, scrub_done,
+	    rebuild_done, B_FALSE));
+}
+
+static void
+vdev_dtl_reassess_outage(vdev_t *vd)
+{
+	return (vdev_dtl_reassess_impl(vd, 0, 0, B_FALSE, B_FALSE, B_TRUE));
 }
 
 /*
@@ -3548,7 +3570,11 @@ vdev_dtl_sync(vdev_t *vd, uint64_t txg)
 }
 
 /*
- * Determine whether the specified vdev can be offlined/detached/removed
+ * Determine whether the specified vdev can be
+ * - offlined
+ * - detached
+ * - removed
+ * - faulted
  * without losing data.
  */
 boolean_t
@@ -3570,10 +3596,10 @@ vdev_dtl_required(vdev_t *vd)
 	 * If not, we can safely offline/detach/remove the device.
 	 */
 	vd->vdev_cant_read = B_TRUE;
-	vdev_dtl_reassess(tvd, 0, 0, B_FALSE, B_FALSE);
+	vdev_dtl_reassess_outage(tvd);
 	required = !vdev_dtl_empty(tvd, DTL_OUTAGE);
 	vd->vdev_cant_read = cant_read;
-	vdev_dtl_reassess(tvd, 0, 0, B_FALSE, B_FALSE);
+	vdev_dtl_reassess_outage(tvd);
 
 	if (!required && zio_injection_enabled) {
 		required = !!zio_handle_device_injection(vd, NULL,
