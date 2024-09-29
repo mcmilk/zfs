@@ -14,7 +14,7 @@ OSv=$OS
 
 # compressed with .zst extension
 REPO="https://github.com/mcmilk/openzfs-freebsd-images"
-FREEBSD="$REPO/releases/download/v2024-09-16"
+FREEBSD="$REPO/releases/download/v2024-09-30"
 URLzs=""
 
 # Ubuntu mirrors

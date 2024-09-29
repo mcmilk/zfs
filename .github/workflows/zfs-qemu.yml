@@ -22,8 +22,8 @@ jobs:
       - name: Generate OS config and CI type
         id: os
         run: |
-          FULL_OS='["almalinux8", "almalinux9", "centos-stream9", "debian11", "debian12", "fedora39", "fedora40", "freebsd13", "freebsd13r", "freebsd14", "freebsd14r", "ubuntu20", "ubuntu22", "ubuntu24"]'
-          QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora40", "freebsd13", "freebsd14", "ubuntu24"]'
+          FULL_OS='["almalinux8", "almalinux9", "centos-stream9", "debian11", "debian12", "fedora39", "fedora40", "freebsd13", "freebsd13r", "freebsd14", "freebsd14r", "freebsd15", "ubuntu20", "ubuntu22", "ubuntu24"]'
+          QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora40", "freebsd13", "freebsd14", "freebsd15", "ubuntu24"]'
           # determine CI type when running on PR
           ci_type="full"
           if ${{ github.event_name == 'pull_request' }}; then
