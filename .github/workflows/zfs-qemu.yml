@@ -22,7 +22,7 @@ jobs:
       - name: Generate OS config and CI type
         id: os
         run: |
-          FULL_OS='["almalinux9", "freebsd14"]'
+          FULL_OS='["almalinux9", "freebsd13"]'
           QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora40", "freebsd13", "freebsd14", "ubuntu24"]'
           # determine CI type when running on PR
           ci_type="full"
