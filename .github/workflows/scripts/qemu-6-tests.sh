@@ -97,7 +97,7 @@ fi
 sudo dmesg -c > dmesg-prerun.txt
 mount > mount.txt
 df -h > df-prerun.txt
-$TDIR/zfs-tests.sh -vK -s 3GB -T $TAGS
+$TDIR/zfs-tests.sh -vK -s 3GB -T zfs_load-key,zfs_unload-key
 RV=$?
 df -h > df-postrun.txt
 echo $RV > tests-exitcode.txt
