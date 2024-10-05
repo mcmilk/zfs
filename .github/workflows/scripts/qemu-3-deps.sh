@@ -49,6 +49,10 @@ function freebsd() {
   sudo pkg install -y autoconf automake autotools base64 checkbashisms fio \
     gdb gettext gettext-runtime git gmake gsed jq ksh93 lcov libtool lscpu \
     pkgconf python python3 pamtester pamtester qemu-guest-agent rsync xxhash
+
+  echo oooo
+  sleep 212121
+
   sudo pkg install -xy \
     '^samba4[[:digit:]]+$' \
     '^py3[[:digit:]]+-cffi$' \
