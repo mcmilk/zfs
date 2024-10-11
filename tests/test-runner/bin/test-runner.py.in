@@ -642,18 +642,22 @@ Tags: %s
 
 
 class TestRun(object):
-    props = ['quiet', 'outputdir', 'debug']
+    props = ['quiet', 'outputdir', 'debug', 'nosummary']
 
     def __init__(self, options):
         self.tests = {}
         self.testgroups = {}
         self.starttime = time()
-        self.timestamp = datetime.now().strftime('%Y%m%dT%H%M%S')
+        if options.nosummary:
+            self.timestamp = 'tag-client'
+        else:
+            self.timestamp = datetime.now().strftime('%Y%m%dT%H%M%S')
         self.outputdir = os.path.join(options.outputdir, self.timestamp)
         self.setup_logging(options)
         self.defaults = [
             ('outputdir', BASEDIR),
             ('quiet', False),
+            ('nosummary', False),
             ('timeout', 60),
             ('user', ''),
             ('pre', ''),
@@ -879,10 +883,10 @@ class TestRun(object):
         if not options.template:
             try:
                 old = os.umask(0)
-                os.makedirs(self.outputdir, mode=0o777)
+                os.makedirs(self.outputdir, mode=0o777, exist_ok=True)
                 os.umask(old)
                 filename = os.path.join(self.outputdir, 'log')
-                LOG_FILE_OBJ = open(filename, buffering=0, mode='wb')
+                LOG_FILE_OBJ = open(filename, buffering=0, mode='ab')
             except OSError as e:
                 fail('%s' % e)
 
@@ -943,6 +947,20 @@ class TestRun(object):
 
         return 0
 
+    def nosummary(self):
+        if Result.total == 0:
+            return 2
+
+        if Result.runresults['FAIL'] > 0:
+            return 1
+
+        if Result.runresults['KILLED'] > 0:
+            return 1
+
+        if Result.runresults['RERAN'] > 0:
+            return 3
+
+        return 0
 
 def write_log(msg, target):
     """
@@ -1113,6 +1131,8 @@ def parse_args():
                       type='string', help='Specify a post script.')
     parser.add_option('-q', action='store_true', default=False, dest='quiet',
                       help='Silence on the console during a test run.')
+    parser.add_option('-Q', action='store_true', default=False, dest='nosummary',
+                      help='Print no summary on the console.')
     parser.add_option('-s', action='callback', callback=options_cb,
                       default='', dest='failsafe', metavar='script',
                       type='string', help='Specify a failsafe script.')
@@ -1170,7 +1190,11 @@ def main():
 
     testrun.complete_outputdirs()
     testrun.run(options)
-    exit(testrun.summary())
+
+    if options.nosummary:
+        exit(testrun.nosummary())
+    else:
+        exit(testrun.summary())
 
 
 if __name__ == '__main__':
