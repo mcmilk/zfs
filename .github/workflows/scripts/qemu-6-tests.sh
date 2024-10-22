@@ -97,6 +97,10 @@ fi
 sudo dmesg -c > dmesg-prerun.txt
 mount > mount.txt
 df -h > df-prerun.txt
+
+echo "READY !!!"
+sleep 212121
+
 $TDIR/zfs-tests.sh -vK -s 3GB -T $TAGS
 RV=$?
 df -h > df-postrun.txt
