@@ -46,7 +46,7 @@ fi
 
 if [ -e /etc/os-release ] ; then
 	source /etc/os-release
-	if [ $PLATFORM_ID = "platform:el9" ]; then
+	if [ "$PLATFORM_ID" = "platform:el9" ]; then
 		log_unsupported "Disabled on RHEL 9 variants: fails with 'Operation not permitted'"
 	fi
 fi

@@ -93,7 +93,7 @@ log_must zpool wait -t resilver $TESTPOOL
 log_must zpool wait -t scrub $TESTPOOL
 
 nof_resilver=$(zpool events | grep -c resilver_start)
-if [ $nof_resilver = 1 ] ; then
+if [ "$nof_resilver" = 1 ] ; then
 	log_must verify_pool $TESTPOOL
 	log_pass "zpool clear on draid pool doesn't cause concurrent resilvers"
 else

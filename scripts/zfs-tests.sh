@@ -53,6 +53,7 @@ ZFS_DMESG="$STF_SUITE/callbacks/zfs_dmesg.ksh"
 UNAME=$(uname)
 RERUN=""
 KMEMLEAK=""
+TAG_CLIENT=""
 
 # Override some defaults if on FreeBSD
 if [ "$UNAME" = "FreeBSD" ] ; then
@@ -210,9 +211,8 @@ find_runfile() {
 }
 
 # Given a TAGS with a format like "1/3" or "2/3" then divide up the test list
-# into portions and print that portion.  So "1/3" for "the first third of the
+# into portions and print that portion. So "1/3" for "the first third of the
 # test tags".
-#
 #
 split_tags() {
 	# Get numerator and denominator
@@ -250,6 +250,77 @@ split_tags() {
 		uniq | grep -v functional | \
 		awk -v num="$NUM" -v den="$DEN" '{ if(NR % den == (num - 1)) {printf "%s,",$0}}' | \
 		sed -E 's/,$//'
+}
+
+# Test for old instance of server and stop it + delete old tmpfiles
+tag_server_stop() {
+	test -s $PIDFILE && kill `cat $PIDFILE` || true 2>/dev/null
+	rm -rf $RDIR
+}
+
+# Given a TAGS with a format like "192.168.122.10:12345/server", then start
+# in TAG-Server mode, which multiple clients can ask for the next TAG.
+# - the server replys with next TAG or EOF on the end
+# - ip and port are variable
+# - the "/server" string in the end is fixed for server mode
+#
+RDIR="/tmp/tag-server"
+RESPONSE="$RDIR/response.sh"
+PIDFILE="$RDIR/tag-server.pid"
+tag_server() {
+	IP=$1
+	PORT=$2
+	NAME=$3
+
+	tag_server_stop
+	mkdir -p $RDIR
+
+	# generate a response script
+	i=0; x=""
+	_RUNFILES=${RUNFILES//","/" "}
+	cat $_RUNFILES | tr -d "[],\'" | awk '/tags = /{print $NF}' | sort | \
+		uniq | grep -v functional > TAGS
+	while read line; do 
+		i=$((i+1))
+		x="$x\nTAGS[$i]=$line"
+	done < ./TAGS
+	rm -f TAGS
+	TAGS=$(echo -e "$x")
+	cat <<EOF > $RESPONSE
+#!/usr/bin/env bash
+
+while test -f \$0.lock; do sleep 0.2; done
+touch \$0.lock
+set -eu
+declare -A TAGS
+$TAGS
+MAX=$i
+todo=\$(cat \$0.current)
+next=\$((todo+1))
+if [ \$todo -gt \$MAX ]; then
+  echo "NONE"
+else
+  echo \${TAGS[\$todo]}
+  echo \$next > \$0.current
+fi
+rm -f \$0.lock
+EOF
+	chmod +x $RESPONSE
+	echo 1 > $RESPONSE.current
+	# start server socket and bind to given IP:PORT
+	socat TCP-LISTEN:$PORT,bind=$IP,reuseaddr,fork SYSTEM:"'${SHELL}' $RESPONSE" &
+	echo $! > $PIDFILE
+	echo "TAG-Server ($IP:$PORT) started with PID $(cat $PIDFILE)"
+	exit
+}
+
+# Given a TAGS with a format like "192.168.122.10:12345/vmN", then start
+# as a TAG Client, which asks a server for the tests that should be run.
+#
+tag_client() {
+	IP=$1
+	PORT=$2
+	echo -n|socat - TCP:$IP:$PORT
 }
 
 #
@@ -349,37 +420,43 @@ constrain_path() {
 usage() {
 cat << EOF
 USAGE:
-$0 [-hvqxkfS] [-s SIZE] [-r RUNFILES] [-t PATH] [-u USER]
+$0 [-hvqDxkfScRm] [-n NFSFILE] [-I NUM] [-d DIR] [-s SIZE] ...
+... [-r RUNFILES] [-t PATH|NAME] [-T TAGS] [-u USER]
 
 DESCRIPTION:
 	ZFS Test Suite launch script
 
 OPTIONS:
-	-h          Show this message
-	-v          Verbose zfs-tests.sh output
-	-q          Quiet test-runner output
-	-D          Debug; show all test output immediately (noisy)
-	-x          Remove all testpools, dm, lo, and files (unsafe)
-	-k          Disable cleanup after test failure
-	-K          Log test names to /dev/kmsg
-	-f          Use files only, disables block device tests
-	-S          Enable stack tracer (negative performance impact)
-	-c          Only create and populate constrained path
-	-R          Automatically rerun failing tests
-	-m          Enable kmemleak reporting (Linux only)
-	-n NFSFILE  Use the nfsfile to determine the NFS configuration
-	-I NUM      Number of iterations
-	-d DIR      Use world-writable DIR for files and loopback devices
-	-s SIZE     Use vdevs of SIZE (default: 4G)
-	-r RUNFILES Run tests in RUNFILES (default: ${DEFAULT_RUNFILES})
-	-t PATH|NAME  Run single test at PATH relative to test suite,
-	                or search for test by NAME
-	-T TAGS     Comma separated list of tags (default: 'functional')
-	            Alternately, specify a fraction like "1/3" or "2/3" to
-		     run the first third of tests or 2nd third of the tests.  This
-		     is useful for splitting up the test amongst different
+	-h           Show this message
+	-v           Verbose zfs-tests.sh output
+	-q           Quiet test-runner output
+	-D           Debug; show all test output immediately (noisy)
+	-x           Remove all testpools, dm, lo, and files (unsafe)
+	-k           Disable cleanup after test failure
+	-K           Log test names to /dev/kmsg
+	-f           Use files only, disables block device tests
+	-S           Enable stack tracer (negative performance impact)
+	-c           Only create and populate constrained path
+	-R           Automatically rerun failing tests
+	-m           Enable kmemleak reporting (Linux only)
+	-n NFSFILE   Use the nfsfile to determine the NFS configuration
+	-I NUM       Number of iterations
+	-d DIR       Use world-writable DIR for files and loopback devices
+	-s SIZE      Use vdevs of SIZE (default: 4G)
+	-r RUNFILES  Run tests in RUNFILES (default: ${DEFAULT_RUNFILES})
+	-t PATH|NAME Run single test at PATH relative to test suite, or search
+		     for test by NAME
+	-T TAGS      Comma separated list of tags (default: 'functional')
+		     Alternately #1: specify a fraction like "1/3" or "2/3" to
+		     run the first third of tests or 2nd third of the tests.
+		     This is useful for splitting up the test amongst different
 		     runners.
-	-u USER     Run single test as USER (default: root)
+		     Alternately #2: specify a client/server IP:PORT definition
+		     like this for server: -T 192.168.100.2:2323/server and
+		     this for client: -T 192.168.100.2:2323/client1. This is
+		     also useful for dynamic splitting up the test amongst
+		     different runners.
+	-u USER      Run single test as USER (default: root)
 
 EXAMPLES:
 # Run the default ${DEFAULT_RUNFILES//\.run/} suite of tests and output the configuration used.
@@ -537,8 +614,6 @@ fi
 #
 TAGS=${TAGS:='functional'}
 
-
-
 #
 # Attempt to locate the runfiles describing the test workload.
 #
@@ -574,6 +649,11 @@ RUNFILES=${R#,}
 #
 if echo "$TAGS" | grep -Eq '^[0-9]+/[0-9]+$' ; then
 	TAGS=$(split_tags)
+elif echo "$TAGS" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\:[0-9]+/server$' ; then
+	TAG_ARGS=$(echo "$TAGS"|tr ":/" " ")
+	tag_server $TAG_ARGS
+elif echo "$TAGS" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\:[0-9]+/.*$' ; then
+	TAG_CLIENT="$TAGS"
 fi
 
 #
@@ -759,28 +839,93 @@ RESULTS_FILE=$(mktemp_file zts-results)
 REPORT_FILE=$(mktemp_file zts-report)
 
 #
+# Calculate a time difference with $TSSTART and the current time
+#
+get_time_diff() {
+	CURRENT=$(date +%s)
+	DIFF=$((CURRENT-TSSTART))
+	H=$((DIFF/3600))
+	DIFF=$((DIFF-(H*3600)))
+	M=$((DIFF/60))
+	S=$((DIFF-(M*60)))
+	printf "%02d:%02d:%02d" "$H" "$M" "$S"
+}
+
+#
+# Run only one test, so no summary and so on
+#
+run_tests_tag_client() {
+	PATH=$STF_PATH \
+	    ${TEST_RUNNER} \
+	    ${QUIET:+-q} -Q \
+	    ${DEBUG:+-D} \
+	    ${KMEMLEAK:+-m} \
+	    ${KMSG:+-K} \
+	    -c "${RUNFILES}" \
+	    -T "${TAGS}" \
+	    -i "${STF_SUITE}" \
+	    -I "${ITERATIONS}" \
+	    2>&1 | tee -a "$RESULTS_FILE"
+	echo $? >"$REPORT_FILE"
+}
+
+#
 # Run all the tests as specified.
 #
-msg "${TEST_RUNNER}" \
-    "${QUIET:+-q}" \
-    "${DEBUG:+-D}" \
-    "${KMEMLEAK:+-m}" \
-    "${KMSG:+-K}" \
-    "-c \"${RUNFILES}\"" \
-    "-T \"${TAGS}\"" \
-    "-i \"${STF_SUITE}\"" \
-    "-I \"${ITERATIONS}\""
-{ PATH=$STF_PATH \
-    ${TEST_RUNNER} \
-    ${QUIET:+-q} \
-    ${DEBUG:+-D} \
-    ${KMEMLEAK:+-m} \
-    ${KMSG:+-K} \
-    -c "${RUNFILES}" \
-    -T "${TAGS}" \
-    -i "${STF_SUITE}" \
-    -I "${ITERATIONS}" \
-    2>&1; echo $? >"$REPORT_FILE"; } | tee "$RESULTS_FILE"
+if [ -z "$TAG_CLIENT" ]; then
+	# default
+	msg "${TEST_RUNNER}" \
+	    "${QUIET:+-q}" \
+	    "${DEBUG:+-D}" \
+	    "${KMEMLEAK:+-m}" \
+	    "${KMSG:+-K}" \
+	    "-c \"${RUNFILES}\"" \
+	    "-T \"${TAGS}\"" \
+	    "-i \"${STF_SUITE}\"" \
+	    "-I \"${ITERATIONS}\""
+	{ PATH=$STF_PATH \
+	    ${TEST_RUNNER} \
+	    ${QUIET:+-q} \
+	    ${DEBUG:+-D} \
+	    ${KMEMLEAK:+-m} \
+	    ${KMSG:+-K} \
+	    -c "${RUNFILES}" \
+	    -T "${TAGS}" \
+	    -i "${STF_SUITE}" \
+	    -I "${ITERATIONS}" \
+	    2>&1; echo $? >"$REPORT_FILE"; } | tee "$RESULTS_FILE"
+else
+	# tag-client
+	TSSTART=$(date +%s)
+	TAG_ARGS=$(echo "$TAG_CLIENT"|tr ":/" " ")
+	while true; do
+		TAGS=$(tag_client $TAG_ARGS)
+		test "$TAGS" = "NONE" && break
+		run_tests_tag_client
+	done
+
+	# Add Summary to $RESULTS_FILE
+	awk -v T=$(get_time_diff) '
+BEGIN { pass=0; skip=0; fail=0; }
+/\[PASS\]/  { pass+=1 }
+/\[FAIL\]/  { fail+=1 }
+/\[KILLED\]/  { fail+=1 }
+/\[SKIP\]/  { skip+=1 }
+END {
+ if (pass+fail+skip > 0)
+   percent_passed = (pass/(pass+fail+skip) * 100)
+ else
+  percent_passed = 0
+ print "\nResults Summary"
+ printf("PASS:\t%4d\n", pass)
+ printf("FAIL:\t%4d\n", fail)
+ printf("SKIP:\t%4d\n\n", skip)
+ printf("Running Time:\t%s\n", T)
+ printf("Percent passed:\t%.1f%\n", percent_passed)
+ printf("Log directory:\t/var/tmp/test_results/tag-client\n\n")
+}' $RESULTS_FILE | tee -a $RESULTS_FILE
+fi
+
 read -r RUNRESULT <"$REPORT_FILE"
 
 #
@@ -815,7 +960,6 @@ if [ "$RESULT" -eq "2" ] && [ -n "$RERUN" ]; then
 	${ZTS_REPORT} --no-maybes "$RESULTS_FILE" >"$REPORT_FILE"
 	RESULT=$?
 fi
-
 
 cat "$REPORT_FILE"
 

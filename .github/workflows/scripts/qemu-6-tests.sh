@@ -9,16 +9,19 @@
 
 set -eu
 
-function prefix() {
-  ID="$1"
-  LINE="$2"
+function get_time_diff() {
   CURRENT=$(date +%s)
-  TSSTART=$(cat /tmp/tsstart)
   DIFF=$((CURRENT-TSSTART))
   H=$((DIFF/3600))
   DIFF=$((DIFF-(H*3600)))
   M=$((DIFF/60))
   S=$((DIFF-(M*60)))
+  printf "%02d:%02d:%02d" "$H" "$M" "$S"
+}
+
+function prefix() {
+  ID="$1"
+  LINE="$2"
 
   CTR=$(cat /tmp/ctr)
   echo $LINE| grep -q "^Test[: ]" && CTR=$((CTR+1)) && echo $CTR > /tmp/ctr
@@ -27,12 +30,13 @@ function prefix() {
   COLOR="$BASE/scripts/zfs-tests-color.sh"
   CLINE=$(echo $LINE| grep "^Test[ :]" | sed -e 's|/usr/local|/usr|g' \
     | sed -e 's| /usr/share/zfs/zfs-tests/tests/| |g' | $COLOR)
+
   if [ -z "$CLINE" ]; then
     printf "vm${ID}: %s\n" "$LINE"
   else
     # [vm2: 00:15:54  256] Test: functional/checksum/setup (run as root) [00:00] [PASS]
-    printf "[vm${ID}: %02d:%02d:%02d %4d] %s\n" \
-      "$H" "$M" "$S" "$CTR" "$CLINE"
+    t=$(get_time_diff)
+    printf "[vm${ID}: %s %4d] %s\n" "$t" "$CTR" "$CLINE"
   fi
 }
 
@@ -42,9 +46,9 @@ if [ -z ${1:-} ]; then
   source env.txt
   SSH=$(which ssh)
   TESTS='$HOME/zfs/.github/workflows/scripts/qemu-6-tests.sh'
-  echo 0 > /tmp/ctr
-  date "+%s" > /tmp/tsstart
+  TSSTART=$(date +%s)
 
+  echo 0 > /tmp/ctr
   for i in $(seq 1 $VMs); do
     IP="192.168.122.1$i"
     daemonize -c /var/tmp -p vm${i}.pid -o vm${i}log.txt -- \
@@ -54,7 +58,7 @@ if [ -z ${1:-} ]; then
       | while read -r line; do prefix "$i" "$line"; done &
     echo $! > vm${i}log.pid
     # don't mix up the initial --- Configuration --- part
-    sleep 0.13
+    sleep 0.2
   done
 
   # wait for all vm's to finish
@@ -65,6 +69,8 @@ if [ -z ${1:-} ]; then
     kill $pid
   done
 
+  echo "VMs finished... kill tag server"
+  kill $(cat /tmp/tag-server/tag-server.pid)
   exit 0
 fi
 
@@ -97,8 +103,20 @@ fi
 sudo dmesg -c > dmesg-prerun.txt
 mount > mount.txt
 df -h > df-prerun.txt
-$TDIR/zfs-tests.sh -vK -s 3GB -T $TAGS
+
+# start tag-server on the first vm:
+if [ "$2" = "1" ]; then
+	$TDIR/zfs-tests.sh -vK -s 3GB -T 192.168.122.11:2323/server
+fi
+
+# wait for tag-server on first VM
+sleep 1
+
+# run all tags, provided by tag-server
+$TDIR/zfs-tests.sh -vK -s 3GB -T 192.168.122.11:2323/vm$2
 RV=$?
+
+# get some stats
 df -h > df-postrun.txt
 echo $RV > tests-exitcode.txt
 sync

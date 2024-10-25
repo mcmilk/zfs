@@ -16,7 +16,7 @@ function archlinux() {
   sudo pacman -Sy --noconfirm base-devel bc cpio cryptsetup dhclient dkms \
     fakeroot fio gdb inetutils jq less linux linux-headers lsscsi nfs-utils \
     parted pax perf python-packaging python-setuptools qemu-guest-agent ksh \
-    samba sysstat rng-tools rsync wget xxhash
+    samba socat sysstat rng-tools rsync wget xxhash
   echo "##[endgroup]"
 }
 
@@ -38,7 +38,8 @@ function debian() {
     lsscsi nfs-kernel-server pamtester parted python3 python3-all-dev \
     python3-cffi python3-dev python3-distlib python3-packaging \
     python3-setuptools python3-sphinx qemu-guest-agent rng-tools rpm2cpio \
-    rsync samba sysstat uuid-dev watchdog wget xfslibs-dev  xxhash zlib1g-dev
+    rsync samba socat sysstat uuid-dev watchdog wget xfslibs-dev xxhash \
+    zlib1g-dev
   echo "##[endgroup]"
 }
 
@@ -48,7 +49,8 @@ function freebsd() {
   echo "##[group]Install Development Tools"
   sudo pkg install -y autoconf automake autotools base64 checkbashisms fio \
     gdb gettext gettext-runtime git gmake gsed jq ksh93 lcov libtool lscpu \
-    pkgconf python python3 pamtester pamtester qemu-guest-agent rsync xxhash
+    pkgconf python python3 pamtester pamtester qemu-guest-agent rsync socat \
+    xxhash
   sudo pkg install -xy \
     '^samba4[[:digit:]]+$' \
     '^py3[[:digit:]]+-cffi$' \
@@ -81,7 +83,8 @@ function rhel() {
     libuuid-devel lsscsi mdadm nfs-utils openssl-devel pam-devel pamtester \
     parted perf python3 python3-cffi python3-devel python3-packaging \
     kernel-devel python3-setuptools qemu-guest-agent rng-tools rpcgen \
-    rpm-build rsync samba sysstat systemd watchdog wget xfsprogs-devel xxhash \
+    rpm-build rsync samba socat sysstat systemd watchdog wget \
+    xfsprogs-devel xxhash \
     zlib-devel
   echo "##[endgroup]"
 }

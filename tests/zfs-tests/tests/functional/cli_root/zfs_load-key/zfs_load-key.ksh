@@ -73,7 +73,7 @@ log_mustnot eval "echo $PASSPHRASE | zfs load-key $TESTPOOL/$TESTFS1"
 typeset DISK2 _
 read -r _ DISK2 _ <<<"$DISKS"
 log_must eval "echo $PASSPHRASE | zpool create -O encryption=on" \
-	"-O keyformat=passphrase -O keylocation=prompt $TESTPOOL1 $DISK2"
+	"-O keyformat=passphrase -O keylocation=prompt -f $TESTPOOL1 $DISK2"
 
 log_must zfs unmount $TESTPOOL1
 log_must zfs unload-key $TESTPOOL1
