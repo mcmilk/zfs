@@ -22,8 +22,9 @@ jobs:
       - name: Generate OS config and CI type
         id: os
         run: |
-          FULL_OS='["almalinux8", "almalinux9", "centos-stream9", "debian11", "debian12", "fedora40", "fedora41", "freebsd13-4r", "freebsd14-0r", "freebsd14-1s", "ubuntu20", "ubuntu22", "ubuntu24"]'
-          QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora41", "freebsd13-3r", "freebsd14-1r", "ubuntu24"]'
+          FULL_OS='["almalinux8", "almalinux9", "centos-stream9", "debian11", "debian12", "fedora40", "fedora41", "freebsd13-3r", "freebsd13-4r", "freebsd14-1r", "freebsd14-2r", "ubuntu20", "ubuntu22", "ubuntu24"]'
+          QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora41", "freebsd13-3r", "freebsd14-2r", "ubuntu24"]'
+          FREEBSD_OS='["freebsd13-3r", "freebsd13-4r", "freebsd14-1r", "freebsd14-2r", "freebsd13-4s", "freebsd14-2s", "freebsd15-0c"]'
           # determine CI type when running on PR
           ci_type="full"
           if ${{ github.event_name == 'pull_request' }}; then
@@ -31,11 +32,17 @@ jobs:
             base=${{ github.event.pull_request.base.sha }}
             ci_type=$(python3 .github/workflows/scripts/generate-ci-type.py $head $base)
           fi
-          if [ "$ci_type" == "quick" ]; then
-            os_selection="$QUICK_OS"
-          else
-            os_selection="$FULL_OS"
-          fi
+          case "$ci_type" in
+            quick)
+              os_selection="$QUICK_OS"
+              ;;
+            freebsd)
+              os_selection="$FREEBSD_OS"
+              ;;
+            *)
+              os_selection="$FULL_OS"
+              ;;
+          esac
           os_json=$(echo ${os_selection} | jq -c)
           echo "os=$os_json" >> $GITHUB_OUTPUT
           echo "ci_type=$ci_type" >> $GITHUB_OUTPUT
@@ -49,9 +56,10 @@ jobs:
         # rhl:     almalinux8, almalinux9, centos-stream9, fedora40, fedora41
         # debian:  debian11, debian12, ubuntu20, ubuntu22, ubuntu24
         # misc:    archlinux, tumbleweed
-        # FreeBSD Release: freebsd13-3r, freebsd13-4r, freebsd14-0r, freebsd14-1r
-        # FreeBSD Stable:  freebsd13-4s, freebsd14-1s
-        # FreeBSD Current: freebsd15-0c
+        # FreeBSD variants of 2024-12:
+        # RELEASE: freebsd13-3r, freebsd13-4r, freebsd14-1r, freebsd14-2r
+        # STABLE:  freebsd13-4s, freebsd14-2s
+        # CURRENT: freebsd15-0c
         os: ${{ fromJson(needs.test-config.outputs.test_os) }}
     runs-on: ubuntu-24.04
     steps:

@@ -68,6 +68,8 @@ if __name__ == '__main__':
     ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     for line in last_commit_message_raw.stdout.decode().splitlines():
+        if line.strip().lower() == 'zfs-ci-type: freebsd':
+            output_type('freebsd', f'explicitly requested by HEAD commit {head}')
         if line.strip().lower() == 'zfs-ci-type: quick':
             output_type('quick', f'explicitly requested by HEAD commit {head}')
 
