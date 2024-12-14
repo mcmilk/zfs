@@ -99,13 +99,6 @@ rewind_reason = 'Arbitrary pool rewind is not guaranteed'
 fio_reason = 'Fio v2.3 or newer required'
 
 #
-# Some tests require that the DISKS provided support the discard operation.
-# Normally this is not an issue because loop back devices are used for DISKS
-# and they support discard (TRIM/UNMAP).
-#
-trim_reason = 'DISKS must support discard (TRIM/UNMAP)'
-
-#
 # Some tests on FreeBSD require the fspacectl(2) system call and the
 # truncate(1) utility supporting the -d option.  The system call was first
 # introduced in FreeBSD version 1400032.
@@ -171,9 +164,6 @@ if sys.platform.startswith('freebsd'):
             ['FAIL', known_reason],
         'cli_root/zpool_resilver/zpool_resilver_concurrent':
             ['SKIP', na_reason],
-        'cli_root/zpool_wait/zpool_wait_trim_basic': ['SKIP', trim_reason],
-        'cli_root/zpool_wait/zpool_wait_trim_cancel': ['SKIP', trim_reason],
-        'cli_root/zpool_wait/zpool_wait_trim_flag': ['SKIP', trim_reason],
         'cli_root/zfs_unshare/zfs_unshare_008_pos': ['SKIP', na_reason],
         'cp_files/cp_files_002_pos': ['SKIP', na_reason],
         'link_count/link_count_001': ['SKIP', na_reason],
@@ -227,9 +217,6 @@ maybe = {
         ['FAIL', known_reason],
     'cli_root/zpool_labelclear/zpool_labelclear_removed':
         ['FAIL', known_reason],
-    'cli_root/zpool_trim/setup': ['SKIP', trim_reason],
-    'cli_root/zpool_trim/zpool_trim_fault_export_import_online':
-        ['FAIL', known_reason],
     'cli_root/zpool_upgrade/zpool_upgrade_004_pos': ['FAIL', 6141],
     'cli_user/misc/arc_summary_001_pos': ['FAIL', known_reason],
     'delegate/setup': ['SKIP', exec_reason],
@@ -263,7 +250,6 @@ maybe = {
     'snapshot/snapshot_009_pos': ['FAIL', 7961],
     'snapshot/snapshot_010_pos': ['FAIL', 7961],
     'snapused/snapused_004_pos': ['FAIL', 5513],
-    'trim/setup': ['SKIP', trim_reason],
     'upgrade/upgrade_projectquota_001_pos': ['SKIP', project_id_reason],
     'upgrade/upgrade_projectquota_002_pos': ['SKIP', project_id_reason],
     'user_namespace/setup': ['SKIP', user_ns_reason],

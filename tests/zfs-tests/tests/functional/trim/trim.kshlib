@@ -23,7 +23,7 @@
 #
 function get_size_mb
 {
-	du --block-size 1048576 -s "$1" | cut -f1
+	du -m -s "$1" | cut -f1
 }
 
 #
@@ -39,10 +39,12 @@ function get_trim_io
 	# Sum the ind or agg columns of the trim request size histogram.
 	case "$type" in
 	"ind")
+		log_must zpool iostat -pr $pool $vdev
 		zpool iostat -pr $pool $vdev |
 		    awk '$1 ~ /[0-9].*/ { sum += $12 } END { print sum }'
 		;;
 	"agg")
+		log_must zpool iostat -pr $pool $vdev
 		zpool iostat -pr $pool $vdev |
 		    awk '$1 ~ /[0-9].*/ { sum += $13 } END { print sum }'
 		;;
@@ -64,7 +66,7 @@ function verify_trim_io
 	typeset ios
 
 	ios=$(get_trim_io $pool $type $vdev)
-	if [[ $ios -ge $min_trim_ios ]]; then
+	if [[ "$ios" -ge "$min_trim_ios" ]]; then
 		log_note "Issued $ios $type trim IOs for pool $pool"
 	else
 		log_fail "Too few trim IOs issued $ios/$min_trim_ios"

@@ -65,6 +65,8 @@ if [ -z ${1:-} ]; then
     kill $pid
   done
 
+  echo "sleeping"
+  sleep 123456
   exit 0
 fi
 
@@ -95,14 +97,10 @@ esac
 
 # run functional testings and save exitcode
 cd /var/tmp
-TAGS=$2/$3
-if [ "$4" == "quick" ]; then
-  export RUNFILES="sanity.run"
-fi
 sudo dmesg -c > dmesg-prerun.txt
 mount > mount.txt
 df -h > df-prerun.txt
-$TDIR/zfs-tests.sh -vK -s 3GB -T $TAGS
+$TDIR/zfs-tests.sh -vK -s 3GB -T zpool_trim,zpool_wait,trim
 RV=$?
 df -h > df-postrun.txt
 echo $RV > tests-exitcode.txt

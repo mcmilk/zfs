@@ -52,6 +52,7 @@ function cleanup
 log_onexit cleanup
 
 LARGESIZE=$((MINVDEVSIZE * 4))
+LARGESIZE_KB=$((LARGESIZE/1024))
 LARGEFILE="$TESTDIR/largefile"
 
 # The minimum number of metaslabs is increased in order to simulate the
@@ -69,20 +70,20 @@ log_must zpool create -O compression=off $TESTPOOL "$LARGEFILE"
 log_must mkfile $(( floor(LARGESIZE * 0.80) )) /$TESTPOOL/file
 sync_all_pools
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must test $new_size -le $LARGESIZE
-log_must test $new_size -gt $(( floor(LARGESIZE * 0.70) ))
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must test $new_size -le $LARGESIZE_KB
+log_must test $new_size -gt $(( floor(LARGESIZE_KB * 0.70) ))
 
 # Expand the pool to create new unallocated metaslabs.
 log_must zpool export $TESTPOOL
-log_must dd if=/dev/urandom of=$LARGEFILE conv=notrunc,nocreat \
+log_must dd if=/dev/urandom of=$LARGEFILE conv=notrunc \
     seek=$((LARGESIZE / (1024 * 1024))) bs=$((1024 * 1024)) \
     count=$((3 * LARGESIZE / (1024 * 1024)))
 log_must zpool import -d $TESTDIR $TESTPOOL
 log_must zpool online -e $TESTPOOL "$LARGEFILE"
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must test $new_size -gt $((4 * floor(LARGESIZE * 0.70) ))
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must test $new_size -gt $((4 * floor(LARGESIZE_KB * 0.70) ))
 
 # Perform a partial trim, we expect it to skip most of the new metaslabs
 # which have never been used and therefore do not need be trimmed.
@@ -95,8 +96,8 @@ while [[ "$(trim_progress $TESTPOOL $LARGEFILE)" -lt "100" ]]; do
 	sleep 0.5
 done
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must test $new_size -gt $LARGESIZE
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must test $new_size -gt $LARGESIZE_KB
 
 # Perform a full trim, all metaslabs will be trimmed the pool vdev
 # size will be reduced but not down to its original size due to the
@@ -108,8 +109,8 @@ while [[ "$(trim_progress $TESTPOOL $LARGEFILE)" -lt "100" ]]; do
 	sleep 0.5
 done
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must test $new_size -le $(( 2 * LARGESIZE))
-log_must test $new_size -gt $(( floor(LARGESIZE * 0.70) ))
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must test $new_size -le $(( 2 * LARGESIZE_KB))
+log_must test $new_size -gt $(( floor(LARGESIZE_KB * 0.70) ))
 
 log_pass "Manual 'zpool trim' successfully partially trimmed pool"
