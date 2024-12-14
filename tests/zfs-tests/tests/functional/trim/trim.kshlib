@@ -38,10 +38,12 @@ function get_trim_io
 	# Sum the ind or agg columns of the trim request size histogram.
 	case "$type" in
 	"ind")
+		log_must zpool iostat -pr $pool $vdev
 		zpool iostat -pr $pool $vdev |
 		    awk '$1 ~ /[0-9].*/ { sum += $12 } END { print sum }'
 		;;
 	"agg")
+		log_must zpool iostat -pr $pool $vdev
 		zpool iostat -pr $pool $vdev |
 		    awk '$1 ~ /[0-9].*/ { sum += $13 } END { print sum }'
 		;;
