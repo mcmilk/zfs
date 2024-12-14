@@ -65,7 +65,7 @@ function verify_trim_io
 	typeset ios
 
 	ios=$(get_trim_io $pool $type $vdev)
-	if [[ $ios -ge $min_trim_ios ]]; then
+	if [[ "$ios" -ge "$min_trim_ios" ]]; then
 		log_note "Issued $ios $type trim IOs for pool $pool"
 	else
 		log_fail "Too few trim IOs issued $ios/$min_trim_ios"

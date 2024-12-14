@@ -65,9 +65,8 @@ if [ -z ${1:-} ]; then
     kill $pid
   done
 
-  echo "sleep1"
-  sleep 123456
-
+  #echo "sleep1"
+  #sleep 123456
   exit 0
 fi
 
@@ -101,7 +100,4 @@ RV=$?
 df -h > df-postrun.txt
 echo $RV > tests-exitcode.txt
 sync
-
-echo "sleep2"
-sleep 123456
 exit 0
