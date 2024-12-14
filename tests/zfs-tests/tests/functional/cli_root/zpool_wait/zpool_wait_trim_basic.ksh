@@ -45,9 +45,7 @@ function trim_in_progress
 	zpool status -t "$pool" | grep "trimmed, started"
 }
 
-if is_freebsd; then
-	log_unsupported "FreeBSD has no hole punching mechanism for the time being."
-fi
+# xxx
 
 typeset -r FILE_VDEV="$TESTDIR/file_vdev"
 typeset pid

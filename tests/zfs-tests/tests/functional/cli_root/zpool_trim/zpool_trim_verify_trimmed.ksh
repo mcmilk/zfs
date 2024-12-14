@@ -58,7 +58,7 @@ log_must mkdir "$TESTDIR"
 log_must truncate -s $LARGESIZE "$LARGEFILE"
 log_must zpool create $TESTPOOL "$LARGEFILE"
 
-original_size=$(du -B1 "$LARGEFILE" | cut -f1)
+original_size=$(du -k "$LARGEFILE" | cut -f1)
 
 log_must zpool initialize $TESTPOOL
 
@@ -66,8 +66,8 @@ while [[ "$(initialize_progress $TESTPOOL $LARGEFILE)" -lt "100" ]]; do
         sleep 0.5
 done
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must within_tolerance $new_size $LARGESIZE $((128 * 1024 * 1024))
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must within_tolerance $new_size $LARGESIZE $((128 * 1024))
 
 log_must zpool trim $TESTPOOL
 
@@ -75,7 +75,7 @@ while [[ "$(trim_progress $TESTPOOL $LARGEFILE)" -lt "100" ]]; do
         sleep 0.5
 done
 
-new_size=$(du -B1 "$LARGEFILE" | cut -f1)
-log_must within_tolerance $new_size $original_size $((128 * 1024 * 1024))
+new_size=$(du -k "$LARGEFILE" | cut -f1)
+log_must within_tolerance $new_size $original_size $((128 * 1024))
 
 log_pass "Trimmed appropriate amount of disk space"
