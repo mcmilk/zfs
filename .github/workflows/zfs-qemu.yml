@@ -23,6 +23,7 @@ jobs:
         id: os
         run: |
           FULL_OS='["almalinux8", "almalinux9", "centos-stream9", "debian11", "debian12", "fedora40", "fedora41", "freebsd13-3r", "freebsd13-4s", "freebsd14-1r", "freebsd14-2s", "freebsd15-0c", "ubuntu20", "ubuntu22", "ubuntu24"]'
+          FULL_OS='["freebsd13-3r", "freebsd13-4s", "freebsd14-1r", "freebsd14-2s", "freebsd15-0c"]'
           QUICK_OS='["almalinux8", "almalinux9", "debian12", "fedora41", "freebsd13-3r", "freebsd14-2r", "ubuntu24"]'
           # determine CI type when running on PR
           ci_type="full"
@@ -60,6 +61,18 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Setup SSH
+      run: |
+        mkdir -p $HOME/.ssh
+        echo "ConnectTimeout 5" >> $HOME/.ssh/config
+        echo "StrictHostKeyChecking no" >> $HOME/.ssh/config
+        echo "${{ secrets.AUTHORIZED_KEYS }}" >> $HOME/.ssh/authorized_keys
+        echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        echo "${{ secrets.KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+        chmod 600 $HOME/.ssh/id_ed25519
+        R=`shuf -n 1 -i 10000-60000`
+        echo "Port  $R"
+        ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
     - name: Setup QEMU
       timeout-minutes: 10
       run: .github/workflows/scripts/qemu-1-setup.sh

@@ -14,8 +14,7 @@ OSv=$OS
 
 # compressed with .zst extension
 REPO="https://github.com/mcmilk/openzfs-freebsd-images"
-FREEBSD="$REPO/releases/download/v2024-12-14"
-URLzs=""
+FREEBSD="$REPO/releases/download/v2024-12-30"
 
 # Ubuntu mirrors
 #UBMIRROR="https://cloud-images.ubuntu.com"
@@ -24,6 +23,8 @@ UBMIRROR="https://mirror.citrahost.com/ubuntu-cloud-images"
 
 # default nic model for vm's
 NIC="virtio"
+URLzs=""
+URLxz=""
 
 case "$OS" in
   almalinux8)
@@ -92,6 +93,7 @@ case "$OS" in
     OSNAME="FreeBSD 13.4-STABLE"
     OSv="freebsd13.0"
     URLzs="$FREEBSD/amd64-freebsd-13.4-STABLE.qcow2.zst"
+    #URLxz="https://download.freebsd.org/snapshots/VM-IMAGES/13.4-STABLE/amd64/Latest/FreeBSD-13.4-STABLE-amd64.qcow2.xz"
     BASH="/usr/local/bin/bash"
     NIC="rtl8139"
     ;;
@@ -99,12 +101,14 @@ case "$OS" in
     OSNAME="FreeBSD 14.2-STABLE"
     OSv="freebsd14.0"
     URLzs="$FREEBSD/amd64-freebsd-14.2-STABLE.qcow2.zst"
+    #URLxz="https://download.freebsd.org/snapshots/VM-IMAGES/14.2-STABLE/amd64/Latest/FreeBSD-14.2-STABLE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
   freebsd15-0c)
     OSNAME="FreeBSD 15.0-CURRENT"
     OSv="freebsd14.0"
     URLzs="$FREEBSD/amd64-freebsd-15.0-CURRENT.qcow2.zst"
+    #URLxz="https://download.freebsd.org/snapshots/VM-IMAGES/15.0-CURRENT/amd64/Latest/FreeBSD-15.0-CURRENT-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
   tumbleweed)
@@ -159,7 +163,11 @@ sudo chown -R $(whoami) /mnt/tests
 # we are downloading via axel, curl and wget are mostly slower and
 # require more return value checking
 IMG="/mnt/tests/cloudimg.qcow2"
-if [ ! -z "$URLzs" ]; then
+if [ ! -z "$URLxz" ]; then
+  echo "Loading image $URLxz ..."
+  time axel -q -o "$IMG.xz" "$URLxz"
+  xz -d "$IMG.xz"
+elif [ ! -z "$URLzs" ]; then
   echo "Loading image $URLzs ..."
   time axel -q -o "$IMG.zst" "$URLzs"
   zstd -q -d --rm "$IMG.zst"
@@ -172,11 +180,15 @@ DISK="/dev/zvol/zpool/openzfs"
 FORMAT="raw"
 sudo zfs create -ps -b 64k -V 80g zpool/openzfs
 while true; do test -b $DISK && break; sleep 1; done
+
 echo "Importing VM image to zvol..."
 sudo qemu-img dd -f qcow2 -O raw if=$IMG of=$DISK bs=4M
 rm -f $IMG
 
+# password: zfs
+PASSWD='$y$j9T$BWr6h85zr6b2Ts6dS333n/$maAowG8a3gVhOxdrfnh503Kz4rwjx/UlR3tIlgt0qO3'
 PUBKEY=$(cat ~/.ssh/id_ed25519.pub)
+
 cat <<EOF > /tmp/user-data
 #cloud-config
 
@@ -184,10 +196,13 @@ fqdn: $OS
 
 users:
 - name: root
-  shell: $BASH
-- name: zfs
+  passwd: $PASSWD
   sudo: ALL=(ALL) NOPASSWD:ALL
-  shell: $BASH
+  ssh_authorized_keys:
+    - $PUBKEY
+- name: zfs
+  passwd: $PASSWD
+  sudo: ALL=(ALL) NOPASSWD:ALL
   ssh_authorized_keys:
     - $PUBKEY
 
