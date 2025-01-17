@@ -44,35 +44,54 @@ sudo systemctl restart ksmtuned
 sudo systemctl stop docker.socket
 sudo systemctl stop multipathd.socket
 
-# remove default swapfile and /mnt
+# remove default swapfile
 sudo swapoff -a
-sudo umount -l /mnt
-DISK="/dev/disk/cloud/azure_resource-part1"
-sudo sed -e "s|^$DISK.*||g" -i /etc/fstab
-sudo wipefs -aq $DISK
-sudo systemctl daemon-reload
-
 sudo modprobe loop
 sudo modprobe zfs
+sudo sed -e "s|^/dev/disk/cloud.*||g" -i /etc/fstab
 
-# partition the disk as needed
-DISK="/dev/disk/cloud/azure_resource"
-sudo sgdisk --zap-all $DISK
-sudo sgdisk -p \
+# HOSTTYPE=aarch64
+case "$HOSTTYPE" in
+  aarch64)
+    DISK="/dev/nvme0n1"
+    ;;
+  *)
+    # remove default /mnt
+    sudo umount -l /mnt
+    sudo systemctl daemon-reload
+    DISK="/dev/disk/cloud/azure_resource"
+    ;;
+esac
+
+sudo sgdisk --zap-all ${DISK}
+sudo sgdisk -p -a 4096 \
  -n 1:0:+16G -c 1:"swap" \
  -n 2:0:0    -c 2:"tests" \
 $DISK
 sync
 sleep 1
 
-# swap with same size as RAM
-sudo mkswap $DISK-part1
-sudo swapon $DISK-part1
+sudo fdisk -l $DISK
+case "$HOSTTYPE" in
+  aarch64)
+    # swap with same size as RAM
+    sudo mkswap ${DISK}p1
+    sudo swapon ${DISK}p1
 
-# 60GB data disk
-SSD1="$DISK-part2"
+    # ~204GB scratch disk
+    SSD1="${DISK}p2"
+    ;;
+  *)
+    # swap with same size as RAM
+    sudo mkswap $DISK-part1
+    sudo swapon $DISK-part1
 
-# 10GB data disk on ext4
+    # ~60GB scratch disk
+    SSD1="$DISK-part2"
+    ;;
+esac
+
+# 10GB data disk on ext4 rootfs
 sudo fallocate -l 10G /test.ssd1
 SSD2=$(sudo losetup -b 4096 -f /test.ssd1 --show)
 

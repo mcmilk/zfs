@@ -1,5 +1,4 @@
 name: zfs-qemu
-
 on:
   push:
   pull_request:
@@ -23,7 +22,7 @@ concurrency:
 jobs:
   test-config:
     name: Setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     outputs:
       test_os: ${{ steps.os.outputs.os }}
       ci_type: ${{ steps.os.outputs.ci_type }}
@@ -49,7 +48,7 @@ jobs:
             os_selection="$FULL_OS"
           fi
           os_json=$(echo ${os_selection} | jq -c)
-          
+
           # Add optional runners
           if [ "${{ github.event.inputs.include_stream9 }}" == 'true' ]; then
             os_json=$(echo $os_json | jq -c '. += ["centos-stream9"]')
@@ -57,15 +56,14 @@ jobs:
           if [ "${{ github.event.inputs.include_stream10 }}" == 'true' ]; then
             os_json=$(echo $os_json | jq -c '. += ["centos-stream10"]')
           fi
-          
+
           echo $os_json
           echo "os=$os_json" >> $GITHUB_OUTPUT
           echo "ci_type=$ci_type" >> $GITHUB_OUTPUT
 
+# ubuntu-24.04-arm
 
-
-          
-  qemu-vm:
+  qemu-x86:
     name: qemu-x86
     needs: [ test-config ]
     strategy:
@@ -79,18 +77,30 @@ jobs:
         # FreeBSD Stable:  freebsd13-4s, freebsd14-2s
         # FreeBSD Current: freebsd15-0c
         os: ${{ fromJson(needs.test-config.outputs.test_os) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Setup SSH
+      run: |
+        mkdir -p $HOME/.ssh
+        echo "ConnectTimeout 4" >> $HOME/.ssh/config
+        echo "StrictHostKeyChecking no" >> $HOME/.ssh/config
+        echo "${{ secrets.AUTHORIZED_KEYS }}" >> $HOME/.ssh/authorized_keys
+        echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        echo "${{ secrets.KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+        chmod 600 $HOME/.ssh/id_ed25519
+        R=`shuf -n 1 -i 10000-60000`
+        echo "Port $R"
+        ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
     - name: Setup QEMU
       timeout-minutes: 10
       run: .github/workflows/scripts/qemu-1-setup.sh
 
     - name: Start build machine
-      timeout-minutes: 10
+      timeout-minutes: 100
       run: .github/workflows/scripts/qemu-2-start.sh ${{ matrix.os }}
 
     - name: Install dependencies
@@ -108,6 +118,8 @@ jobs:
         tail --pid=$PID -f /dev/null
         sleep 5 # avoid this: "error: Domain is already active"
         rm -f $HOME/.ssh/known_hosts
+        echo "SLEEP"
+        sleep 21212121
 
     - name: Build modules
       timeout-minutes: 30
@@ -152,7 +164,7 @@ jobs:
     if: always()
     name: Cleanup
     runs-on: ubuntu-latest
-    needs: [ qemu-vm ]
+    needs: [ qemu-x86 ]
 
     steps:
     - uses: actions/checkout@v4
