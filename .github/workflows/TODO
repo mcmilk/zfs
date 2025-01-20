@@ -1,0 +1,10 @@
+
+
++# sudo virt-install   --os-variant almalinux8   --name openzfs
++#   --cpu host-passthrough   --virt-type=kvm   --vcpus=4,sockets=1
++#      --memory 12288   --memballoon model=virtio   --graphics none
++#   --network bridge=virbr0,model=virtio,mac='52:54:00:83:79:00'
++# --cloud-init user-data=/tmp/user-data
++#   --disk /dev/zvol/zpool/openzfs,bus=virtio,cache=none,format=raw,driver.discard=unmap
++#   --import --noautoconsole
+

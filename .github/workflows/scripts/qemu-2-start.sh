@@ -235,7 +235,6 @@ echo "sudo virt-install \
   --disk $DISK,bus=virtio,cache=none,format=$FORMAT,driver.discard=unmap \
   --import --noautoconsole"
 
-
 sudo virt-install \
   --os-variant $OSv \
   --name "openzfs" \
