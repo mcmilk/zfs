@@ -80,14 +80,16 @@ case "$OS" in
     OSNAME="FreeBSD 14.2-RELEASE"
     OSv="freebsd14.0"
     #URLzs="$FREEBSD/amd64-freebsd-14.2-RELEASE.qcow2.zst"
-    URLxz="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
+    #URLxz="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
+    URLxz="https://download.freebsd.org/releases/CI-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CI.ufs.raw.xz"
     BASH="/usr/local/bin/bash"
     ;;
   freebsd13-5r)
     OSNAME="FreeBSD 13.4-STABLE"
     OSv="freebsd13.0"
     #URLzs="$FREEBSD/amd64-freebsd-13.4-STABLE.qcow2.zst"
-    URLxz="https://download.freebsd.org/releases/VM-IMAGES/13.5-RELEASE/amd64/Latest/FreeBSD-13.5-RELEASE-amd64.qcow2.xz"
+    #URLxz="https://download.freebsd.org/releases/VM-IMAGES/13.5-RELEASE/amd64/Latest/FreeBSD-13.5-RELEASE-amd64.qcow2.xz"
+    URLxz="https://download.freebsd.org/releases/CI-IMAGES/13.5-RELEASE/amd64/Latest/FreeBSD-13.5-RELEASE-amd64-BASIC-CI.raw.xz"
     BASH="/usr/local/bin/bash"
     NIC="rtl8139"
     ;;
