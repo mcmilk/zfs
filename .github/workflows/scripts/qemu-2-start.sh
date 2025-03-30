@@ -16,6 +16,7 @@ OSv=$OS
 REPO="https://github.com/mcmilk/openzfs-freebsd-images"
 FREEBSD="$REPO/releases/download/v2024-12-14"
 URLzs=""
+URLxz=""
 
 # Ubuntu mirrors
 #UBMIRROR="https://cloud-images.ubuntu.com"
@@ -72,6 +73,7 @@ case "$OS" in
     OSNAME="FreeBSD 13.4-RELEASE"
     OSv="freebsd13.0"
     URLzs="$FREEBSD/amd64-freebsd-13.4-RELEASE.qcow2.zst"
+    URLzs="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     NIC="rtl8139"
     ;;
@@ -79,12 +81,14 @@ case "$OS" in
     OSNAME="FreeBSD 14.2-RELEASE"
     OSv="freebsd14.0"
     URLzs="$FREEBSD/amd64-freebsd-14.2-RELEASE.qcow2.zst"
+    URLzs="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
-  freebsd13-4s)
+  freebsd13-5r)
     OSNAME="FreeBSD 13.4-STABLE"
     OSv="freebsd13.0"
     URLzs="$FREEBSD/amd64-freebsd-13.4-STABLE.qcow2.zst"
+    URLzs="https://download.freebsd.org/releases/VM-IMAGES/13.5-RELEASE/amd64/Latest/FreeBSD-13.5-RELEASE-amd64.qcow2.xz"
     BASH="/usr/local/bin/bash"
     NIC="rtl8139"
     ;;
@@ -98,6 +102,7 @@ case "$OS" in
     OSNAME="FreeBSD 15.0-CURRENT"
     OSv="freebsd14.0"
     URLzs="$FREEBSD/amd64-freebsd-15.0-CURRENT.qcow2.zst"
+    URLzs="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
   tumbleweed)
@@ -156,6 +161,10 @@ if [ ! -z "$URLzs" ]; then
   echo "Loading image $URLzs ..."
   time axel -q -o "$IMG.zst" "$URLzs"
   zstd -q -d --rm "$IMG.zst"
+elif [ ! -z "$URLxz" ]; then
+  echo "Loading image $URLxz ..."
+  time axel -q -o "$IMG.xz" "$URLxz"
+  xzcat "$IMG.xz" > "$IMG"
 else
   echo "Loading image $URL ..."
   time axel -q -o "$IMG" "$URL"
