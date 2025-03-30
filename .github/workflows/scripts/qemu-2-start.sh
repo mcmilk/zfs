@@ -176,7 +176,11 @@ FORMAT="raw"
 sudo zfs create -ps -b 64k -V 80g zpool/openzfs
 while true; do test -b $DISK && break; sleep 1; done
 echo "Importing VM image to zvol..."
+if [ ! -z "$URLxz" ]; then
+sudo dd if=$IMG of=$DISK bs=4M
+else
 sudo qemu-img dd -f qcow2 -O raw if=$IMG of=$DISK bs=4M
+fi
 rm -f $IMG
 
 PUBKEY=$(cat ~/.ssh/id_ed25519.pub)
