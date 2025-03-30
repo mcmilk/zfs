@@ -79,14 +79,14 @@ case "$OS" in
   freebsd14-2r)
     OSNAME="FreeBSD 14.2-RELEASE"
     OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-14.2-RELEASE.qcow2.zst"
+    #URLzs="$FREEBSD/amd64-freebsd-14.2-RELEASE.qcow2.zst"
     URLxz="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
   freebsd13-5r)
     OSNAME="FreeBSD 13.4-STABLE"
     OSv="freebsd13.0"
-    URLzs="$FREEBSD/amd64-freebsd-13.4-STABLE.qcow2.zst"
+    #URLzs="$FREEBSD/amd64-freebsd-13.4-STABLE.qcow2.zst"
     URLxz="https://download.freebsd.org/releases/VM-IMAGES/13.5-RELEASE/amd64/Latest/FreeBSD-13.5-RELEASE-amd64.qcow2.xz"
     BASH="/usr/local/bin/bash"
     NIC="rtl8139"
@@ -100,7 +100,7 @@ case "$OS" in
   freebsd15-0c)
     OSNAME="FreeBSD 15.0-CURRENT"
     OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-15.0-CURRENT.qcow2.zst"
+    #URLzs="$FREEBSD/amd64-freebsd-15.0-CURRENT.qcow2.zst"
     URLxz="https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64-BASIC-CLOUDINIT.ufs.qcow2.xz"
     BASH="/usr/local/bin/bash"
     ;;
