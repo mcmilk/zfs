@@ -24,7 +24,7 @@ case "$OS" in
     ;;
   *)
     # Linux needs more memory, but can be optimized to share it via KSM
-    RAM=8
+    RAM=7
     ;;
 esac
 
