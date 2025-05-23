@@ -228,7 +228,7 @@ sudo virt-install \
   --cpu host-passthrough \
   --virt-type=kvm --hvm \
   --vcpus=4,sockets=1 \
-  --memory $((1024*12)) \
+  --memory $((1024*15)) \
   --memballoon model=virtio \
   --graphics none \
   --network bridge=virbr0,model=$NIC,mac='52:54:00:83:79:00' \

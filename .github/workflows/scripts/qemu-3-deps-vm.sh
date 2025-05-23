@@ -64,6 +64,9 @@ function freebsd() {
 
 # common packages for: almalinux, centos, redhat
 function rhel() {
+  echo "SLEEP 2212121"
+  sleep 2121212121
+
   echo "##[group]Running dnf update"
   echo "max_parallel_downloads=10" | sudo -E tee -a /etc/dnf/dnf.conf
   sudo dnf clean all
