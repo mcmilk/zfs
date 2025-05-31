@@ -20,6 +20,9 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -q -N ""
 sudo systemctl stop docker.socket
 sudo systemctl stop multipathd.socket
 
+echo sleeeeeeeeeeeeeep
+sleep 212121
+
 # remove default swapfile and /mnt
 sudo swapoff -a
 sudo umount -l /mnt
@@ -65,3 +68,4 @@ sudo zpool create -f -o ashift=12 zpool $SSD1 $SSD2 -O relatime=off \
 for i in /sys/block/s*/queue/scheduler; do
   echo "none" | sudo tee $i
 done
+

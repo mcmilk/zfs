@@ -28,30 +28,30 @@ NIC="virtio"
 case "$OS" in
   almalinux8)
     OSNAME="AlmaLinux 8"
-    URL="https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
+    URL="https://repo.almalinux.org/almalinux/8/cloud/aarch64/images/AlmaLinux-8-GenericCloud-latest.aarch64.qcow2"
     ;;
   almalinux9)
     OSNAME="AlmaLinux 9"
-    URL="https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
+    URL="https://repo.almalinux.org/almalinux/9/cloud/aarch64/images/AlmaLinux-9-GenericCloud-latest.aarch64.qcow2"
     ;;
   almalinux10)
     OSNAME="AlmaLinux 10"
     OSv="almalinux9"
-    URL="https://repo.almalinux.org/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2"
+    URL="https://repo.almalinux.org/almalinux/10/cloud/aarch64/images/AlmaLinux-10-GenericCloud-latest.aarch64.qcow2"
     ;;
   archlinux)
     OSNAME="Archlinux"
-    URL="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+    URL="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-aarch64-cloudimg.qcow2"
     ;;
   centos-stream10)
     OSNAME="CentOS Stream 10"
     # TODO: #16903 Overwrite OSv to stream9 for virt-install until it's added to osinfo
     OSv="centos-stream9"
-    URL="https://cloud.centos.org/centos/10-stream/x86_64/images/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2"
+    URL="https://cloud.centos.org/centos/10-stream/aarch64/images/CentOS-Stream-GenericCloud-10-latest.aarch64.qcow2"
     ;;
   centos-stream9)
     OSNAME="CentOS Stream 9"
-    URL="https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+    URL="https://cloud.centos.org/centos/9-stream/aarch64/images/CentOS-Stream-GenericCloud-9-latest.aarch64.qcow2"
     ;;
   debian11)
     OSNAME="Debian 11"
@@ -64,12 +64,12 @@ case "$OS" in
   fedora41)
     OSNAME="Fedora 41"
     OSv="fedora-unknown"
-    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"
+    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-41-1.4.aarch64.qcow2"
     ;;
   fedora42)
     OSNAME="Fedora 42"
     OSv="fedora-unknown"
-    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"
+    URL="https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2"
     ;;
   freebsd13-4r)
     OSNAME="FreeBSD 13.4-RELEASE"
@@ -120,7 +120,7 @@ case "$OS" in
     OSNAME="openSUSE Tumbleweed"
     OSv="opensusetumbleweed"
     MIRROR="http://opensuse-mirror-gce-us.susecloud.net"
-    URL="$MIRROR/tumbleweed/appliances/openSUSE-MicroOS.x86_64-OpenStack-Cloud.qcow2"
+    URL="$MIRROR/tumbleweed/appliances/openSUSE-MicroOS.aarch64-OpenStack-Cloud.qcow2"
     ;;
   ubuntu22)
     OSNAME="Ubuntu 22.04"

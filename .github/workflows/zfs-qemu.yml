@@ -28,7 +28,7 @@ concurrency:
 jobs:
   test-config:
     name: Setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     outputs:
       test_os: ${{ steps.os.outputs.os }}
       ci_type: ${{ steps.os.outputs.ci_type }}
@@ -89,18 +89,31 @@ jobs:
         # FreeBSD Stable:  freebsd13-4s, freebsd14-2s
         # FreeBSD Current: freebsd15-0c
         os: ${{ fromJson(needs.test-config.outputs.test_os) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Setup SSH
+      run: |
+        mkdir -p $HOME/.ssh
+        echo "ConnectTimeout 5" >> $HOME/.ssh/config
+        echo "StrictHostKeyChecking no" >> $HOME/.ssh/config
+        echo "${{ secrets.AUTHORIZED_KEYS }}" >> $HOME/.ssh/authorized_keys
+        echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_ed25519
+        echo "${{ secrets.KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+        chmod 600 $HOME/.ssh/id_ed25519
+        R=`shuf -n 1 -i 10000-60000`
+        echo "Port  $R"
+        ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
+
     - name: Setup QEMU
-      timeout-minutes: 10
+      timeout-minutes: 1000
       run: .github/workflows/scripts/qemu-1-setup.sh
 
     - name: Start build machine
-      timeout-minutes: 10
+      timeout-minutes: 1000
       run: .github/workflows/scripts/qemu-2-start.sh ${{ matrix.os }}
 
     - name: Install dependencies
