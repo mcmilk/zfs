@@ -12,10 +12,10 @@ OS="$1"
 # OS variant (virt-install --os-variant list)
 OSv=$OS
 
-# compressed with .zst extension
-REPO="https://github.com/mcmilk/openzfs-freebsd-images"
-FREEBSD="$REPO/releases/download/v2025-04-13"
-URLzs=""
+# FreeBSD urls's
+FREEBSD_REL="https://download.freebsd.org/releases/CI-IMAGES"
+FREEBSD_SNAP="https://download.freebsd.org/snapshots/CI-IMAGES"
+URLxz=""
 
 # Ubuntu mirrors
 UBMIRROR="https://cloud-images.ubuntu.com"
@@ -72,49 +72,55 @@ case "$OS" in
     URL="https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"
     ;;
   freebsd13-4r)
-    OSNAME="FreeBSD 13.4-RELEASE"
+    FreeBSD="13.4-RELEASE"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
-    URLzs="$FREEBSD/amd64-freebsd-13.4-RELEASE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
     NIC="rtl8139"
     ;;
   freebsd13-5r)
-    OSNAME="FreeBSD 13.5-RELEASE"
+    FreeBSD="13.5-RELEASE"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
-    URLzs="$FREEBSD/amd64-freebsd-13.5-RELEASE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
     NIC="rtl8139"
     ;;
-  freebsd14-1r)
-    OSNAME="FreeBSD 14.1-RELEASE"
-    OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-14.1-RELEASE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
-    ;;
   freebsd14-2r)
-    OSNAME="FreeBSD 14.2-RELEASE"
+    FreeBSD="14.2-RELEASE"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-14.2-RELEASE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
+    ;;
+  freebsd14-3r)
+    FreeBSD="14.3-RELEASE"
+    OSNAME="FreeBSD $FreeBSD"
+    OSv="freebsd14.0"
+    URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
     ;;
   freebsd13-5s)
-    OSNAME="FreeBSD 13.5-STABLE"
+    FreeBSD="13.5-STABLE"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
-    URLzs="$FREEBSD/amd64-freebsd-13.5-STABLE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
     NIC="rtl8139"
     ;;
   freebsd14-2s)
-    OSNAME="FreeBSD 14.2-STABLE"
+    FreeBSD="14.2-STABLE"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-14.2-STABLE.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
+    ;;
+  freebsd14-3s)
+    FreeBSD="14.3-STABLE"
+    OSNAME="FreeBSD $FreeBSD"
+    OSv="freebsd14.0"
+    URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
     ;;
   freebsd15-0c)
-    OSNAME="FreeBSD 15.0-CURRENT"
+    FreeBSD="15.0-CURRENT"
+    OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
-    URLzs="$FREEBSD/amd64-freebsd-15.0-CURRENT.qcow2.zst"
-    BASH="/usr/local/bin/bash"
+    URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
     ;;
   tumbleweed)
     OSNAME="openSUSE Tumbleweed"
@@ -168,41 +174,39 @@ echo "CPU=\"$CPU\"" >> $ENV
 sudo mkdir -p "/mnt/tests"
 sudo chown -R $(whoami) /mnt/tests
 
+DISK="/dev/zvol/zpool/openzfs"
+FORMAT="raw"
+sudo zfs create -ps -b 64k -V 80g zpool/openzfs
+while true; do test -b $DISK && break; sleep 1; done
+
 # we are downloading via axel, curl and wget are mostly slower and
 # require more return value checking
 IMG="/mnt/tests/cloudimg.qcow2"
-if [ ! -z "$URLzs" ]; then
-  echo "Loading image $URLzs ..."
-  time axel -q -o "$IMG.zst" "$URLzs"
-  zstd -q -d --rm "$IMG.zst"
+if [ ! -z "$URLxz" ]; then
+  echo "Loading image $URLxz ..."
+  time axel -q -o "$IMG.xz" "$URLxz"
+  time axel -q -o  "ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/$FreeBSD/src.txz"
 else
   echo "Loading image $URL ..."
   time axel -q -o "$IMG" "$URL"
 fi
 
-DISK="/dev/zvol/zpool/openzfs"
-FORMAT="raw"
-sudo zfs create -ps -b 64k -V 80g zpool/openzfs
-while true; do test -b $DISK && break; sleep 1; done
 echo "Importing VM image to zvol..."
-sudo qemu-img dd -f qcow2 -O raw if=$IMG of=$DISK bs=4M
-rm -f $IMG
+if [ ! -z "$URLxz" ]; then
+  xzcat -T0 "$IMG.xz" | sudo dd of=$DISK bs=4M
+  rm -f $IMG.xz
+else
+  sudo qemu-img dd -f qcow2 -O raw if=$IMG of=$DISK bs=4M
+  rm -f $IMG
+fi
 
 PUBKEY=$(cat ~/.ssh/id_ed25519.pub)
 cat <<EOF > /tmp/user-data
 #cloud-config
 
-fqdn: $OS
+hostname: $OS
 
-users:
-- name: root
-  shell: $BASH
-- name: zfs
-  sudo: ALL=(ALL) NOPASSWD:ALL
-  shell: $BASH
-  ssh_authorized_keys:
-    - $PUBKEY
-
+# minimized without sudo for nuageinit of FreeBSD
 growpart:
   mode: auto
   devices: ['/']
@@ -226,13 +230,6 @@ sudo virt-install \
   --disk $DISK,bus=virtio,cache=none,format=$FORMAT,driver.discard=unmap \
   --import --noautoconsole >/dev/null
 
-# enable KSM on Linux
-if [ ${OS:0:7} != "freebsd" ]; then
-  sudo virsh dommemstat --domain "openzfs" --period 5
-  sudo virsh node-memory-tune 100 50 1
-  echo 1 | sudo tee /sys/kernel/mm/ksm/run > /dev/null
-fi
-
 # Give the VMs hostnames so we don't have to refer to them with
 # hardcoded IP addresses.
 #
@@ -252,3 +249,26 @@ StrictHostKeyChecking no
 # small timeout, used in while loops later
 ConnectTimeout 1
 EOF
+
+if [ ${OS:0:7} != "freebsd" ]; then
+  # enable KSM on Linux
+  sudo virsh dommemstat --domain "openzfs" --period 5
+  sudo virsh node-memory-tune 100 50 1
+  echo 1 | sudo tee /sys/kernel/mm/ksm/run > /dev/null
+else
+  # on FreeBSD we need some more init stuff, because of nuageinit
+  BASH="/usr/local/bin/bash"
+  while pidof /usr/bin/qemu-system-x86_64 >/dev/null; do
+    ssh 2>/dev/null root@vm0 "uname -a" && break
+  done
+  ssh root@vm0 "pkg install -y bash ca_root_nss git qemu-guest-agent python3 py311-cloud-init"
+  ssh root@vm0 "chsh -s $BASH root"
+  ssh root@vm0 "pw add user zfs -w no -m -s $BASH"
+  ssh root@vm0 'mkdir -p ~zfs/.ssh'
+  ssh root@vm0 'echo "zfs ALL=(ALL:ALL) NOPASSWD: ALL" >> /usr/local/etc/sudoers'
+  ssh root@vm0 'echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
+  scp ~/.ssh/id_ed25519.pub "root@vm0:~zfs/.ssh/authorized_keys"
+  ssh root@vm0 'chown -R zfs ~zfs'
+  scp ~/src.txz "root@vm0:/tmp/src.tgz"
+  ssh root@vm0 'tar -C / -zxvf /tmp/src.tgz'
+fi
