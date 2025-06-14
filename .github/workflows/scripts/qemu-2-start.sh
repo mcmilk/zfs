@@ -185,7 +185,7 @@ IMG="/mnt/tests/cloudimg.qcow2"
 if [ ! -z "$URLxz" ]; then
   echo "Loading image $URLxz ..."
   time axel -q -o "$IMG.xz" "$URLxz"
-  time axel -q -o  "ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/$FreeBSD/src.txz"
+  time axel -q -o ~/src.txz "https://download.freebsd.org/ftp/releases/amd64/$FreeBSD/src.txz"
 else
   echo "Loading image $URL ..."
   time axel -q -o "$IMG" "$URL"
