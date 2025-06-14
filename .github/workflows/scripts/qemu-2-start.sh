@@ -76,6 +76,7 @@ case "$OS" in
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
     URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
+    KSRC="$FREEBSD_REL/../amd64/$FreeBSD/src.txz"
     NIC="rtl8139"
     ;;
   freebsd13-5r)
@@ -83,12 +84,14 @@ case "$OS" in
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
     URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
+    KSRC="$FREEBSD_REL/../amd64/$FreeBSD/src.txz"
     NIC="rtl8139"
     ;;
   freebsd14-2r)
     FreeBSD="14.2-RELEASE"
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
+    KSRC="$FREEBSD_REL/../amd64/$FreeBSD/src.txz"
     URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
     ;;
   freebsd14-3r)
@@ -96,12 +99,14 @@ case "$OS" in
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
     URLxz="$FREEBSD_REL/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
+    KSRC="$FREEBSD_REL/../amd64/$FreeBSD/src.txz"
     ;;
   freebsd13-5s)
     FreeBSD="13.5-STABLE"
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd13.0"
     URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI.raw.xz"
+    KSRC="$FREEBSD_SNAP/../amd64/$FreeBSD/src.txz"
     NIC="rtl8139"
     ;;
   freebsd14-2s)
@@ -109,18 +114,21 @@ case "$OS" in
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
     URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
+    KSRC="$FREEBSD_SNAP/../amd64/$FreeBSD/src.txz"
     ;;
   freebsd14-3s)
     FreeBSD="14.3-STABLE"
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
     URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
+    KSRC="$FREEBSD_SNAP/../amd64/$FreeBSD/src.txz"
     ;;
   freebsd15-0c)
     FreeBSD="15.0-CURRENT"
     OSNAME="FreeBSD $FreeBSD"
     OSv="freebsd14.0"
     URLxz="$FREEBSD_SNAP/$FreeBSD/amd64/Latest/FreeBSD-$FreeBSD-amd64-BASIC-CI-ufs.raw.xz"
+    KSRC="$FREEBSD_SNAP/../amd64/$FreeBSD/src.txz"
     ;;
   tumbleweed)
     OSNAME="openSUSE Tumbleweed"
@@ -185,7 +193,7 @@ IMG="/mnt/tests/cloudimg.qcow2"
 if [ ! -z "$URLxz" ]; then
   echo "Loading image $URLxz ..."
   time axel -q -o "$IMG.xz" "$URLxz"
-  time axel -q -o ~/src.txz "https://download.freebsd.org/ftp/releases/amd64/$FreeBSD/src.txz"
+  time axel -q -o ~/src.txz $KSRC
 else
   echo "Loading image $URL ..."
   time axel -q -o "$IMG" "$URL"
