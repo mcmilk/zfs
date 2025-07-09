@@ -48,10 +48,11 @@ function debian() {
 
 function freebsd() {
   export ASSUME_ALWAYS_YES="YES"
+  export IGNORE_OSVERSION="YES"
 
   echo "##[group]Install Development Tools"
   sudo pkg install -y autoconf automake autotools base64 checkbashisms fio \
-    gdb gettext gettext-runtime git gmake gsed jq ksh93 lcov libtool lscpu \
+    gdb gettext gettext-runtime git gmake gsed jq ksh lcov libtool lscpu \
     pkgconf python python3 pamtester pamtester qemu-guest-agent rsync xxhash
   sudo pkg install -xy \
     '^samba4[[:digit:]]+$' \
