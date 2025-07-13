@@ -55,31 +55,6 @@ jobs:
         sleep 212121
     - name: Tests
       run: |
-# remove default swapfile and /mnt
-sudo swapoff -a
-sudo umount -l /mnt
-DISK="/dev/disk/cloud/azure_resource-part1"
-sudo sed -e "s|^$DISK.*||g" -i /etc/fstab
-sudo wipefs -aq $DISK
-sudo systemctl daemon-reload
-
-# partition the disk as needed
-DISK="/dev/disk/cloud/azure_resource"
-sudo sgdisk --zap-all $DISK
-sudo sgdisk -p \
- -n 1:0:+16G -c 1:"swap" \
- -n 2:0:0    -c 2:"tests" \
-$DISK
-sync
-sleep 1
-
-# swap with same size as RAM (16GiB)
-sudo mkswap $DISK-part1
-sudo swapon $DISK-part1
-
-# JBOD 2xdisk for OpenZFS storage (test vm's)
-SSD1=""
-
         sudo truncate -s 256G /mnt/vdev
         sudo zpool create cipool -m $WORK_DIR -O compression=on -o autotrim=on $DISK-part2
         sudo /usr/share/zfs/zloop.sh -t 600 -I 6 -l -m 1 -c $CORE_DIR -f $WORK_DIR -- -T 120 -P 60
