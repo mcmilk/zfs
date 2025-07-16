@@ -11,7 +11,7 @@ export DEBIAN_FRONTEND="noninteractive"
 sudo add-apt-repository ppa:apt-fast/stable
 sudo apt-get -y update
 sudo apt-get -y install apt-fast
-sudo apt-get install -y axel cloud-image-utils daemonize guestfs-tools \
+sudo apt-fast install -y axel cloud-image-utils daemonize guestfs-tools \
   virt-manager linux-modules-extra-$(uname -r) zfsutils-linux
 
 # generate ssh keys
