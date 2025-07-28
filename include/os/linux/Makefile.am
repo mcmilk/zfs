@@ -9,11 +9,6 @@ kernel_linux_HEADERS = \
 	%D%/kernel/linux/mod_compat.h \
 	%D%/kernel/linux/page_compat.h \
 	%D%/kernel/linux/pagemap_compat.h \
-	%D%/kernel/linux/simd.h \
-	%D%/kernel/linux/simd_aarch64.h \
-	%D%/kernel/linux/simd_arm.h \
-	%D%/kernel/linux/simd_powerpc.h \
-	%D%/kernel/linux/simd_x86.h \
 	%D%/kernel/linux/utsname_compat.h \
 	%D%/kernel/linux/vfs_compat.h \
 	%D%/kernel/linux/xattr_compat.h
