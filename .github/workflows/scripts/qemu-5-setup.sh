@@ -29,7 +29,7 @@ case "$OS" in
   debian13)
     RAM=8
     OPTS[0]="--boot"
-    OPTS[1]="uefi=on"
+    OPTS[1]="firmware=efi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no"
     ;;
   *)
     # Linux needs more memory, but can be optimized to share it via KSM
@@ -73,22 +73,6 @@ EOF
 
   sudo virsh net-update default add ip-dhcp-host \
     "<host mac='52:54:00:83:79:0$i' ip='192.168.122.1$i'/>" --live --config
-
-echo "sudo virt-install \
-    --os-variant $OSv \
-    --name "vm$i" \
-    --cpu host-passthrough \
-    --virt-type=kvm --hvm \
-    --vcpus=$CPU,sockets=1 \
-    --cpuset=${CPUSET[$((i-1))]} \
-    --memory $((1024*RAM)) \
-    --memballoon model=virtio \
-    --graphics none \
-    --cloud-init user-data=/tmp/user-data \
-    --network bridge=virbr0,model=$NIC,mac="52:54:00:83:79:0$i" \
-    --disk $DISK-system,bus=virtio,cache=none,format=$FORMAT,driver.discard=unmap \
-    --disk $DISK-tests,bus=virtio,cache=none,format=$FORMAT,driver.discard=unmap \
-    --import --noautoconsole ${OPTS[0]} ${OPTS[1]}"
 
   sudo virt-install \
     --os-variant $OSv \
