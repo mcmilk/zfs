@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 
 ######################################################################
 # 6) load openzfs module and run the tests

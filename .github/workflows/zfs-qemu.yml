@@ -30,7 +30,7 @@ jobs:
         id: os
         run: |
           FULL_OS='["almalinux8", "almalinux9", "almalinux10", "centos-stream9", "centos-stream10", "debian12", "debian13", "fedora41", "fedora42", "freebsd13-5r", "freebsd14-3s", "freebsd15-0c", "ubuntu22", "ubuntu24"]'
-          FULL_OS='["debian11", "debian12", "debian13"]'
+          FULL_OS='["debian13"]'
           QUICK_OS='["almalinux8", "almalinux9", "almalinux10", "debian12", "fedora42", "freebsd14-3s", "ubuntu24"]'
           # determine CI type when running on PR
           ci_type="full"
