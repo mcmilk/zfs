@@ -49,13 +49,13 @@ typedef struct {
 	zio_checksum_tmpl_free_t *(free);
 } chksum_stat_t;
 
+/* current state of identifying the necessary benchmarks */
 #define	AT_STARTUP	0
 #define	AT_BENCHMARK	1
-#define	AT_DONE		2
+static int chksum_state = AT_STARTUP;
 
 static chksum_stat_t *chksum_stat_data = 0;
 static kstat_t *chksum_kstat = NULL;
-static int chksum_stat_limit = AT_STARTUP;
 static int chksum_stat_cnt = 0;
 static void chksum_benchmark(void);
 
@@ -150,16 +150,15 @@ chksum_run(chksum_stat_t *cs, abd_t *abd, void *ctx, int round,
 	hrtime_t start;
 	uint64_t run_bw, run_time_ns, run_count = 0, size = 0;
 	uint32_t l, loops = 0;
-	zio_cksum_t zcp;
 
 	switch (round) {
 	case 1: /* 1k */
 		size = 1<<10; loops = 128; break;
-	case 2: /* 2k */
+	case 2: /* 4k */
 		size = 1<<12; loops = 64; break;
-	case 3: /* 4k */
+	case 3: /* 16k */
 		size = 1<<14; loops = 32; break;
-	case 4: /* 16k */
+	case 4: /* 64k */
 		size = 1<<16; loops = 16; break;
 	case 5: /* 256k */
 		size = 1<<18; loops = 8; break;
@@ -174,8 +173,10 @@ chksum_run(chksum_stat_t *cs, abd_t *abd, void *ctx, int round,
 	kpreempt_disable();
 	start = gethrtime();
 	do {
-		for (l = 0; l < loops; l++, run_count++)
+		for (l = 0; l < loops; l++, run_count++) {
+			zio_cksum_t zcp;
 			cs->func(abd, size, ctx, &zcp);
+		}
 
 		run_time_ns = gethrtime() - start;
 	} while (run_time_ns < MSEC2NSEC(1));
@@ -197,26 +198,21 @@ chksum_benchit(chksum_stat_t *cs)
 	if (cs->init)
 		ctx = cs->init(&cs->salt);
 
-	/* benchmarks in startup mode */
-	if (chksum_stat_limit == AT_STARTUP) {
-		abd = abd_alloc_linear(1<<18, B_FALSE);
+	/* one time benchmark in startup mode */
+	if (chksum_state == AT_STARTUP) {
+		abd = abd_alloc(1<<18, B_FALSE);
 		chksum_run(cs, abd, ctx, 5, &cs->bs256k);
 		goto done;
 	}
 
-	/* allocate test memory via abd linear interface */
-	abd = abd_alloc_linear(1<<20, B_FALSE);
-
-	/* benchmarks when requested */
+	/* benchmarks in benchmark mode */
+	abd = abd_alloc(1<<24, B_FALSE);
 	chksum_run(cs, abd, ctx, 1, &cs->bs1k);
 	chksum_run(cs, abd, ctx, 2, &cs->bs4k);
 	chksum_run(cs, abd, ctx, 3, &cs->bs16k);
 	chksum_run(cs, abd, ctx, 4, &cs->bs64k);
+	chksum_run(cs, abd, ctx, 5, &cs->bs256k);
 	chksum_run(cs, abd, ctx, 6, &cs->bs1m);
-	abd_free(abd);
-
-	/* allocate test memory via abd non linear interface */
-	abd = abd_alloc(1<<24, B_FALSE);
 	chksum_run(cs, abd, ctx, 7, &cs->bs4m);
 	chksum_run(cs, abd, ctx, 8, &cs->bs16m);
 
@@ -244,11 +240,6 @@ chksum_benchmark(void)
 	const zfs_impl_t *blake3 = zfs_impl_get_ops("blake3");
 	const zfs_impl_t *sha256 = zfs_impl_get_ops("sha256");
 	const zfs_impl_t *sha512 = zfs_impl_get_ops("sha512");
-
-	/* benchmarks are done */
-	if (chksum_stat_limit == AT_DONE)
-		return;
-
 
 	/* count implementations */
 	chksum_stat_cnt = 1;  /* edonr */
@@ -332,17 +323,7 @@ chksum_benchmark(void)
 		}
 	}
 	blake3->setid(id_save);
-
-	switch (chksum_stat_limit) {
-	case AT_STARTUP:
-		/* next time we want a full benchmark */
-		chksum_stat_limit = AT_BENCHMARK;
-		break;
-	case AT_BENCHMARK:
-		/* no further benchmarks */
-		chksum_stat_limit = AT_DONE;
-		break;
-	}
+	chksum_state = AT_BENCHMARK;
 }
 
 void
@@ -351,8 +332,7 @@ chksum_init(void)
 #ifdef _KERNEL
 	blake3_per_cpu_ctx_init();
 #endif
-
-	/* 256KiB benchmark */
+	/* run startup 256KiB benchmark */
 	chksum_benchmark();
 
 	/* Install kstats for all implementations */
