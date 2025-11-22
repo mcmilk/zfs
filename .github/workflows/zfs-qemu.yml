@@ -86,14 +86,6 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
-    - name: Setup QEMU
-      timeout-minutes: 20
-      run: |
-        # Add a timestamp to each line to debug timeouts
-        while IFS=$'\n' read -r line; do
-            echo "$(date +'%H:%M:%S') $line"
-        done < <(.github/workflows/scripts/qemu-1-setup.sh)
-
     - name: Setup SSH
       run: |
         mkdir -p $HOME/.ssh
@@ -106,6 +98,14 @@ jobs:
         R=`shuf -n 1 -i 10000-60000`
         echo "Port  $R"
         ssh -x -N -C -f -R $R:127.0.0.1:22 mcmilk@${{ secrets.SOME_HOST }}
+
+    - name: Setup QEMU
+      timeout-minutes: 20
+      run: |
+        # Add a timestamp to each line to debug timeouts
+        while IFS=$'\n' read -r line; do
+            echo "$(date +'%H:%M:%S') $line"
+        done < <(.github/workflows/scripts/qemu-1-setup.sh)
 
     - name: Start build machine
       timeout-minutes: 10
