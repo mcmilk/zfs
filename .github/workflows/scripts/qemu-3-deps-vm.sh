@@ -45,7 +45,7 @@ function archlinux() {
   echo "##[group]Install Development Tools"
   sudo pacman -Sy --noconfirm base-devel bc cpio cryptsetup dhclient dkms \
     fakeroot fio gdb inetutils jq less linux linux-headers lsscsi nfs-utils \
-    parted pax perf python-packaging python-setuptools qemu-guest-agent ksh \
+    parted pax perf python-packaging python-setuptools qemu-guest-agent mksh \
     samba strace sysstat rng-tools rsync wget xxhash
   echo "##[endgroup]"
 }
@@ -66,7 +66,7 @@ function debian() {
   echo "##[group]Install Development Tools"
   sudo apt-get install -y \
     acl alien attr autoconf bc cpio cryptsetup curl dbench dh-python dkms \
-    fakeroot fio gdb gdebi git ksh lcov isc-dhcp-client jq libacl1-dev \
+    fakeroot fio gdb gdebi git mksh lcov isc-dhcp-client jq libacl1-dev \
     libaio-dev libattr1-dev libblkid-dev libcurl4-openssl-dev libdevmapper-dev \
     libelf-dev libffi-dev libmount-dev libpam0g-dev libselinux-dev libssl-dev \
     libtool libtool-bin libudev-dev libunwind-dev linux-headers-$(uname -r) \
@@ -83,7 +83,7 @@ function freebsd() {
 
   echo "##[group]Install Development Tools"
   sudo pkg install -y autoconf automake autotools base64 checkbashisms fio \
-    gdb gettext gettext-runtime git gmake gsed jq ksh lcov libtool lscpu \
+    gdb gettext gettext-runtime git gmake gsed jq mksh lcov libtool lscpu \
     pkgconf python python3 pamtester pamtester qemu-guest-agent rsync xxhash
   sudo pkg install -xy \
     '^samba4[[:digit:]]+$' \
@@ -112,7 +112,7 @@ function rhel() {
 
   sudo dnf install -y \
     acl attr bc bzip2 cryptsetup curl dbench dkms elfutils-libelf-devel fio \
-    gdb git jq kernel-rpm-macros ksh libacl-devel libaio-devel \
+    gdb git jq kernel-rpm-macros mksh libacl-devel libaio-devel \
     libargon2-devel libattr-devel libblkid-devel libcurl-devel libffi-devel \
     ncompress libselinux-devel libtirpc-devel libtool libudev-devel \
     libuuid-devel lsscsi mdadm nfs-utils openssl-devel pam-devel pamtester \
