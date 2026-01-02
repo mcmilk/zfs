@@ -65,6 +65,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+echo "huhu"
+sleep 21221
+
 set -eu
 
 function run() {
