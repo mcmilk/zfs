@@ -15,24 +15,18 @@ function alpine() {
   sudo apk add \
     acl alpine-sdk attr autoconf automake bash build-base clang21 coreutils \
     cpio cryptsetup curl curl-dev dhcpcd eudev eudev-dev eudev-libs findutils \
-    fio gawk gdb gettext-dev git grep jq libaio libaio-dev libcurl \
+    fio gawk gdb gettext-dev git grep jq libaio libaio-dev libcurl mksh \
     libtirpc-dev libtool libunwind libunwind-dev linux-headers linux-tools \
     linux-virt linux-virt-dev lsscsi m4 make nfs-utils openssl-dev parted \
     pax procps py3-cffi py3-distlib py3-packaging py3-setuptools python3 \
     python3-dev qemu-guest-agent rng-tools rsync samba samba-server sed \
     strace sysstat util-linux util-linux-dev wget words xfsprogs xxhash \
     zlib-dev pamtester@testing
+  sudo ln -s /bin/mksh /bin/ksh
   echo "##[endgroup]"
 
   echo "##[group]Switch to eudev"
   sudo setup-devd udev
-  echo "##[endgroup]"
-
-  echo "##[group]Install ksh93 from Source"
-  git clone --depth 1 https://github.com/ksh93/ksh.git /tmp/ksh
-  cd /tmp/ksh
-  ./bin/package make
-  sudo ./bin/package install /
   echo "##[endgroup]"
 }
 
