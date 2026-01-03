@@ -85,6 +85,7 @@ function freebsd() {
     '^py3[[:digit:]]+-sysctl$' \
     '^py3[[:digit:]]+-setuptools$' \
     '^py3[[:digit:]]+-packaging$'
+  sudo ln -s /bin/mksh /bin/ksh
   echo "##[endgroup]"
 }
 
