@@ -227,6 +227,7 @@ SRCS+=	abd_os.c \
 
 #zcommon
 SRCS+=	cityhash.c \
+	xxhash.c \
 	zfeature_common.c \
 	zfs_comutil.c \
 	zfs_deleg.c \

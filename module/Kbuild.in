@@ -226,6 +226,7 @@ zfs-objs += $(addprefix nvpair/,$(NVPAIR_OBJS))
 ZCOMMON_OBJS := \
 	cityhash.o \
 	simd_stat.o \
+	xxhash.o \
 	zfeature_common.o \
 	zfs_comutil.o \
 	zfs_deleg.o \
