@@ -24,7 +24,17 @@
  * Copyright (c) 2017 by Delphix. All rights reserved.
  */
 
-#include <cityhash.h>
+#include "cityhash.h"
+//#define WANT_CITY64
+
+//#include "komihash.h"
+//#define WANT_KOMI
+
+#include "xxhash.h"
+#define WANT_XXH64
+#include "xxhash.c"
+
+#ifdef WANT_CITY64
 
 #define	HASH_K1 0xb492b66fbe98f273ULL
 #define	HASH_K2 0x9ae16a3b2f90404fULL
@@ -89,6 +99,132 @@ cityhash4(uint64_t w1, uint64_t w2, uint64_t w3, uint64_t w4)
 {
 	return (cityhash_impl(w1, w2, w3, w4));
 }
+
+#endif
+
+#ifdef WANT_KOMI
+
+/*
+ * impl via komihash
+ */
+uint64_t
+cityhash1(uint64_t w)
+{
+	komihash_stream_t ctx;
+	const void *p1 = &w;
+
+	komihash_stream_init( &ctx, 0);
+	komihash_stream_update( &ctx, p1, 8);
+	return( komihash_stream_final( &ctx ));
+}
+
+uint64_t
+cityhash2(uint64_t w1, uint64_t w2)
+{
+	komihash_stream_t ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+
+	komihash_stream_init( &ctx, 0);
+	komihash_stream_update( &ctx, p1, 8);
+	komihash_stream_update( &ctx, p2, 8);
+	return( komihash_stream_final( &ctx ));
+}
+
+uint64_t
+cityhash3(uint64_t w1, uint64_t w2, uint64_t w3)
+{
+	komihash_stream_t ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
+
+	komihash_stream_init( &ctx, 0);
+	komihash_stream_update( &ctx, p1, 8);
+	komihash_stream_update( &ctx, p2, 8);
+	komihash_stream_update( &ctx, p3, 8);
+	return( komihash_stream_final( &ctx ));
+}
+
+uint64_t
+cityhash4(uint64_t w1, uint64_t w2, uint64_t w3, uint64_t w4)
+{
+	komihash_stream_t ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
+	const void *p4 = &w4;
+
+	komihash_stream_init( &ctx, 0);
+	komihash_stream_update( &ctx, p1, 8);
+	komihash_stream_update( &ctx, p2, 8);
+	komihash_stream_update( &ctx, p3, 8);
+	komihash_stream_update( &ctx, p4, 8);
+	return( komihash_stream_final( &ctx ));
+}
+#endif
+
+#ifdef WANT_XXH64
+
+/*
+ * impl via xhash64
+ */
+uint64_t
+cityhash1(uint64_t w)
+{
+	struct zfs_xxh64_state ctx;
+	const void *p1 = &w;
+
+	zfs_xxh64_reset(&ctx, 0);
+	zfs_xxh64_update(&ctx, p1, 8);
+	return zfs_xxh64_digest(&ctx);
+}
+
+uint64_t
+cityhash2(uint64_t w1, uint64_t w2)
+{
+	struct zfs_xxh64_state ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+
+	zfs_xxh64_reset(&ctx, 0);
+	zfs_xxh64_update(&ctx, p1, 8);
+	zfs_xxh64_update(&ctx, p2, 8);
+	return zfs_xxh64_digest(&ctx);
+}
+
+uint64_t
+cityhash3(uint64_t w1, uint64_t w2, uint64_t w3)
+{
+	struct zfs_xxh64_state ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
+
+	zfs_xxh64_reset(&ctx, 0);
+	zfs_xxh64_update(&ctx, p1, 8);
+	zfs_xxh64_update(&ctx, p2, 8);
+	zfs_xxh64_update(&ctx, p3, 8);
+	return zfs_xxh64_digest(&ctx);
+}
+
+uint64_t
+cityhash4(uint64_t w1, uint64_t w2, uint64_t w3, uint64_t w4)
+{
+	struct zfs_xxh64_state ctx;
+	const void *p1 = &w1;
+	const void *p2 = &w2;
+	const void *p3 = &w3;
+	const void *p4 = &w4;
+
+	zfs_xxh64_reset(&ctx, 0);
+	zfs_xxh64_update(&ctx, p1, 8);
+	zfs_xxh64_update(&ctx, p2, 8);
+	zfs_xxh64_update(&ctx, p3, 8);
+	zfs_xxh64_update(&ctx, p4, 8);
+	return zfs_xxh64_digest(&ctx);
+}
+#endif
 
 #if defined(_KERNEL)
 EXPORT_SYMBOL(cityhash1);

@@ -121,6 +121,7 @@ df -h > df-prerun.txt
 $TDIR/zfs-tests.sh -vKO -s 3GB -T $TAGS
 RV=$?
 df -h > df-postrun.txt
+cat /proc/spl/kstat/zfs/dbufstats > dbufstats.txt
 echo $RV > tests-exitcode.txt
 sync
 exit 0
