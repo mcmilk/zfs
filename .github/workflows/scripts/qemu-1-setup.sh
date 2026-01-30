@@ -41,6 +41,9 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -q -N ""
 sudo systemctl stop docker.socket
 sudo systemctl stop multipathd.socket
 
+echo "huhu"
+sleep 21221
+
 # remove default swapfile and /mnt
 sudo swapoff -a
 sudo umount -l /mnt
