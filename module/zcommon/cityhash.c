@@ -24,8 +24,9 @@
  * Copyright (c) 2017 by Delphix. All rights reserved.
  */
 
-#if 0
 #include <cityhash.h>
+
+#if 0
 
 #define	HASH_K1 0xb492b66fbe98f273ULL
 #define	HASH_K2 0x9ae16a3b2f90404fULL
@@ -103,6 +104,12 @@ typedef struct {
 #define XXH_SECRET_DEFAULT_SIZE 192
 
 XXH64_hash_t XXH3_64bits(void const *const input, size_t const length);
+XXH64_hash_t XXH3_64bits_withSeed(void const *const input, size_t const length,
+				  XXH64_hash_t const seed);
+XXH64_hash_t XXH3_64bits_withSecret(void const *const input,
+				    size_t const length,
+				    void const *const secret,
+				    size_t const secret_size);
 
 #define PRIME32_1	0x9E3779B1U
 #define PRIME32_2	0x85EBCA77U
