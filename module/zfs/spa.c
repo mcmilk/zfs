@@ -1334,8 +1334,7 @@ spa_taskqs_init(spa_t *spa, zio_type_t t, zio_taskq_type_t q)
 			 * priority than the other taskqs.
 			 */
 			const pri_t pri = (t == ZIO_TYPE_WRITE &&
-			    q == ZIO_TASKQ_ISSUE) ?
-			    wtqclsyspri : maxclsyspri;
+			    q == ZIO_TASKQ_ISSUE) ? wtqclsyspri : maxclsyspri;
 			tq = taskq_create_proc(name, value, pri, 50,
 			    INT_MAX, spa->spa_proc, flags);
 #ifdef HAVE_SYSDC
