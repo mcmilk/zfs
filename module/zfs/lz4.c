@@ -736,7 +736,7 @@ LZ4_decompress_generic(
              */
             if ( (endOnInput ? length != RUN_MASK : length <= 8)
                 /* strictly "less than" on input, to re-enter the loop with at least one byte */
-              && likely((endOnInput ? ip < shortiend : 1) & (op <= shortoend)) ) {
+              && likely((endOnInput ? ip < shortiend : 1) && (op <= shortoend)) ) {
                 /* Copy the literals */
                 LZ4_memcpy(op, ip, endOnInput ? 16 : 8);
                 op += length; ip += length;
@@ -856,7 +856,7 @@ LZ4_decompress_generic(
               variable_length_error error = ok;
               length += read_variable_length(&ip, iend - LASTLITERALS + 1, (int)endOnInput, 0, &error);
               if (error != ok) goto _output_error;
-                if ((safeDecode) && unlikely((uptrval)(op)+length<(uptrval)op)) goto _output_error;   /* overflow detection */
+              if ((safeDecode) && unlikely((uptrval)(op)+length<(uptrval)op)) goto _output_error;   /* overflow detection */
             }
             length += MINMATCH;
 
