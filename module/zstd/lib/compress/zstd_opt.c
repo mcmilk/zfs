@@ -1379,17 +1379,18 @@ _shortestPath:   /* cur, last_pos, best_mlen, best_off have to be set */
             U32 stretchPos = cur;
 
             DEBUGLOG(6, "start reverse traversal (last_pos:%u, cur:%u)",
-                        last_pos, cur); (void)last_pos;
+                last_pos, cur); (void)last_pos;
             assert(storeEnd < ZSTD_OPT_SIZE);
             DEBUGLOG(6, "last stretch copied into pos=%u (llen=%u,mlen=%u,ofc=%u)",
-                        storeEnd, lastStretch.litlen, lastStretch.mlen, lastStretch.off);
+                storeEnd, lastStretch.litlen, lastStretch.mlen, lastStretch.off);
             if (lastStretch.litlen > 0) {
                 /* last "sequence" is unfinished: just a bunch of literals */
                 opt[storeEnd].litlen = lastStretch.litlen;
                 opt[storeEnd].mlen = 0;
                 storeStart = storeEnd-1;
                 opt[storeStart] = lastStretch;
-            } {
+            }
+            {
                 opt[storeEnd] = lastStretch;  /* note: litlen will be fixed */
                 storeStart = storeEnd;
             }
