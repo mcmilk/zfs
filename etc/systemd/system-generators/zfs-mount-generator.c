@@ -204,7 +204,7 @@ line_worker(char *line, const char *cachefile)
 	char *toktmp;
 	/* BEGIN CSTYLED */
 	const char *dataset                     = strtok_r(line, "\t", &toktmp);
-	      char *p_mountpoint                = strtok_r(NULL, "\t", &toktmp);
+	char *p_mountpoint                      = strtok_r(NULL, "\t", &toktmp);
 	const char *p_canmount                  = strtok_r(NULL, "\t", &toktmp);
 	const char *p_atime                     = strtok_r(NULL, "\t", &toktmp);
 	const char *p_relatime                  = strtok_r(NULL, "\t", &toktmp);
@@ -214,13 +214,13 @@ line_worker(char *line, const char *cachefile)
 	const char *p_setuid                    = strtok_r(NULL, "\t", &toktmp);
 	const char *p_nbmand                    = strtok_r(NULL, "\t", &toktmp);
 	const char *p_encroot                   = strtok_r(NULL, "\t", &toktmp) ?: "-";
-	      char *p_keyloc                    = strtok_r(NULL, "\t", &toktmp) ?: strdupa("none");
+	char *p_keyloc                          = strtok_r(NULL, "\t", &toktmp) ?: strdupa("none");
 	const char *p_systemd_requires          = strtok_r(NULL, "\t", &toktmp) ?: "-";
 	const char *p_systemd_requiresmountsfor = strtok_r(NULL, "\t", &toktmp) ?: "-";
 	const char *p_systemd_before            = strtok_r(NULL, "\t", &toktmp) ?: "-";
 	const char *p_systemd_after             = strtok_r(NULL, "\t", &toktmp) ?: "-";
-	      char *p_systemd_wantedby          = strtok_r(NULL, "\t", &toktmp) ?: strdupa("-");
-	      char *p_systemd_requiredby        = strtok_r(NULL, "\t", &toktmp) ?: strdupa("-");
+	char *p_systemd_wantedby                = strtok_r(NULL, "\t", &toktmp) ?: strdupa("-");
+	char *p_systemd_requiredby              = strtok_r(NULL, "\t", &toktmp) ?: strdupa("-");
 	const char *p_systemd_nofail            = strtok_r(NULL, "\t", &toktmp) ?: "-";
 	const char *p_systemd_ignore            = strtok_r(NULL, "\t", &toktmp) ?: "-";
 	/* END CSTYLED */
