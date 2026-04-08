@@ -938,10 +938,10 @@ size_t ZSTD_execSequenceEnd(BYTE* op,
         }
         /* span extDict & currentPrefixSegment */
         {   size_t const length1 = dictEnd - match;
-        ZSTD_memmove(oLitEnd, match, length1);
-        op = oLitEnd + length1;
-        sequence.matchLength -= length1;
-        match = prefixStart;
+            ZSTD_memmove(oLitEnd, match, length1);
+            op = oLitEnd + length1;
+            sequence.matchLength -= length1;
+            match = prefixStart;
         }
     }
     ZSTD_safecopy(op, oend_w, match, sequence.matchLength, ZSTD_overlap_src_before_dst);
@@ -987,10 +987,10 @@ size_t ZSTD_execSequenceEndSplitLitBuffer(BYTE* op,
         }
         /* span extDict & currentPrefixSegment */
         {   size_t const length1 = dictEnd - match;
-        ZSTD_memmove(oLitEnd, match, length1);
-        op = oLitEnd + length1;
-        sequence.matchLength -= length1;
-        match = prefixStart;
+            ZSTD_memmove(oLitEnd, match, length1);
+            op = oLitEnd + length1;
+            sequence.matchLength -= length1;
+            match = prefixStart;
         }
     }
     ZSTD_safecopy(op, oend_w, match, sequence.matchLength, ZSTD_overlap_src_before_dst);
@@ -1060,10 +1060,10 @@ size_t ZSTD_execSequence(BYTE* op,
         }
         /* span extDict & currentPrefixSegment */
         {   size_t const length1 = dictEnd - match;
-        ZSTD_memmove(oLitEnd, match, length1);
-        op = oLitEnd + length1;
-        sequence.matchLength -= length1;
-        match = prefixStart;
+            ZSTD_memmove(oLitEnd, match, length1);
+            op = oLitEnd + length1;
+            sequence.matchLength -= length1;
+            match = prefixStart;
         }
     }
     /* Match within prefix of 1 or more bytes */
@@ -1644,16 +1644,16 @@ ZSTD_decompressSequences_body(ZSTD_DCtx* dctx,
         assert(dst != NULL);
 
 #if defined(__GNUC__) && defined(__x86_64__)
-            __asm__(".p2align 6");
-            __asm__("nop");
+        __asm__(".p2align 6");
+        __asm__("nop");
 #  if __GNUC__ >= 7
-            __asm__(".p2align 5");
-            __asm__("nop");
-            __asm__(".p2align 3");
+        __asm__(".p2align 5");
+        __asm__("nop");
+        __asm__(".p2align 3");
 #  else
-            __asm__(".p2align 4");
-            __asm__("nop");
-            __asm__(".p2align 3");
+        __asm__(".p2align 4");
+        __asm__("nop");
+        __asm__(".p2align 3");
 #  endif
 #endif
 
