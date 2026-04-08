@@ -735,21 +735,22 @@ print_stats(zpool_handle_t *zhp, void *data)
 
 	if (nvlist_lookup_nvlist(
 	    config, ZPOOL_CONFIG_VDEV_TREE, &nvroot) != 0) {
-	zpool_close(zhp);
+		zpool_close(zhp);
 		return (2);
 	}
 	if (nvlist_lookup_uint64_array(nvroot, ZPOOL_CONFIG_VDEV_STATS,
 	    (uint64_t **)&vs, &c) != 0) {
-	zpool_close(zhp);
+		zpool_close(zhp);
 		return (3);
 	}
 
 	pool_name = escape_string(zpool_get_name(zhp));
 	err = print_recursive_stats(print_summary_stats, nvroot,
 	    pool_name, NULL, 1);
+
 	/* if any of these return an error, skip the rest */
 	if (err == 0)
-	err = print_top_level_vdev_stats(nvroot, pool_name);
+		err = print_top_level_vdev_stats(nvroot, pool_name);
 
 	if (no_histograms == 0) {
 	if (err == 0)
