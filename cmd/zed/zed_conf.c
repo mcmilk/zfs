@@ -289,7 +289,8 @@ zed_conf_parse_opts(struct zed_conf *zcp, int argc, char **argv)
 			raw = strtoul(optarg, NULL, 0);
 			if (errno == ERANGE || raw > INT16_MAX) {
 				zed_log_die("%lu is too many jobs", raw);
-			} if (raw == 0) {
+			}
+			if (raw == 0) {
 				zed_log_die("0 jobs makes no sense");
 			} else {
 				zcp->max_jobs = raw;
@@ -300,7 +301,8 @@ zed_conf_parse_opts(struct zed_conf *zcp, int argc, char **argv)
 			raw = strtoul(optarg, NULL, 0);
 			if (errno == ERANGE || raw > INT32_MAX) {
 				zed_log_die("%lu is too large", raw);
-			} if (raw == 0) {
+			}
+			if (raw == 0) {
 				zcp->max_zevent_buf_len = INT32_MAX;
 			} else {
 				zcp->max_zevent_buf_len = raw;
