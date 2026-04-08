@@ -1614,7 +1614,7 @@ construct_spec(nvlist_t *props, int argc, char **argv)
 				child = realloc(child,
 				    children * sizeof (nvlist_t *));
 				if (child == NULL)
-					zpool_no_memory();
+					zpool_no_memory(); /* will exit */
 				if ((nv = make_leaf_vdev(argv[c],
 				    !(is_log || is_special || is_dedup ||
 				    is_spare), ashift)) == NULL) {
@@ -1743,7 +1743,7 @@ construct_spec(nvlist_t *props, int argc, char **argv)
 		toplevels++;
 		top = realloc(top, toplevels * sizeof (nvlist_t *));
 		if (top == NULL)
-			zpool_no_memory();
+			zpool_no_memory(); /* will exit */
 		top[toplevels - 1] = nv;
 	}
 
