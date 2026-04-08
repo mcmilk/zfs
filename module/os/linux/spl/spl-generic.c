@@ -400,10 +400,9 @@ MODULE_PARM_DESC(spl_hostid_path, "The system hostid file (/etc/hostid)");
 static int
 hostid_read(uint32_t *hostid)
 {
-	uint64_t size;
 	uint32_t value = 0;
 	int error;
-	loff_t off;
+	loff_t off = 0;
 	struct file *filp;
 	struct kstat stat;
 
@@ -417,14 +416,13 @@ hostid_read(uint32_t *hostid)
 		filp_close(filp, 0);
 		return (error);
 	}
-	size = stat.size;
-	// cppcheck-suppress sizeofwithnumericparameter
-	if (size < sizeof (HW_HOSTID_MASK)) {
+
+	/* hostid is 4 bytes */
+	if (stat.size < 4) {
 		filp_close(filp, 0);
 		return (EINVAL);
 	}
 
-	off = 0;
 	/*
 	 * Read directly into the variable like eglibc does.
 	 * Short reads are okay; native behavior is preserved.
