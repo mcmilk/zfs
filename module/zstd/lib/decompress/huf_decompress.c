@@ -651,7 +651,7 @@ HUF_decompress4X1_usingDTable_internal_body(
 
         /* up to 16 symbols per loop (4 symbols per stream) in 64-bit mode */
         if ((size_t)(oend - op4) >= sizeof(size_t)) {
-            for ( ; (endSignal) & (op4 < olimit) ; ) {
+            for ( ; (endSignal) && (op4 < olimit) ; ) {
                 HUF_DECODE_SYMBOLX1_2(op1, &bitD1);
                 HUF_DECODE_SYMBOLX1_2(op2, &bitD2);
                 HUF_DECODE_SYMBOLX1_2(op3, &bitD3);
@@ -1432,7 +1432,7 @@ HUF_decompress4X2_usingDTable_internal_body(
 
         /* 16-32 symbols per loop (4-8 symbols per stream) */
         if ((size_t)(oend - op4) >= sizeof(size_t)) {
-            for ( ; (endSignal) & (op4 < olimit); ) {
+            for ( ; (endSignal) && (op4 < olimit); ) {
 #if defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
                 HUF_DECODE_SYMBOLX2_2(op1, &bitD1);
                 HUF_DECODE_SYMBOLX2_1(op1, &bitD1);
