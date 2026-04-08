@@ -192,7 +192,7 @@ zpool_open_func(void *arg)
 			slice->rn_labelpaths = B_FALSE;
 			pthread_mutex_lock(rn->rn_lock);
 			if (avl_find(rn->rn_avl, slice, &where)) {
-			pthread_mutex_unlock(rn->rn_lock);
+				pthread_mutex_unlock(rn->rn_lock);
 				free(slice->rn_name);
 				free(slice);
 			} else {
