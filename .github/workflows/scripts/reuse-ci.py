@@ -15,11 +15,11 @@ WORKFLOWS = {
         "Setup QEMU", "Start build machine", "Install dependencies",
         "Build modules", "Setup testing machines", "Run tests", "Test Summary",
     }),
-    "zloop": ("zloop.yml", "ubuntu-26.04", "zloop", {
+    "zloop": ("zloop.yml", "ubuntu-24.04", "zloop", {
         "Install dependencies", "Autogen.sh", "Configure", "Make",
         "Install", "Tests",
     }),
-    "unit-tests": ("unit-tests.yml", "ubuntu-26.04", "unit-tests", {
+    "unit-tests": ("unit-tests.yml", "ubuntu-24.04", "unit-tests", {
         "Install dependencies", "Autogen", "Configure", "Unit tests",
     }),
     "zfs-arm": ("zfs-arm.yml", "ubuntu-26.04-arm", "ZFS ARM build", {

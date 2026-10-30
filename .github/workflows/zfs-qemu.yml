@@ -26,7 +26,7 @@ jobs:
   test-config:
     name: Setup
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.repository != 'openzfs/zfs'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       actions: read
@@ -129,7 +129,7 @@ jobs:
         # FreeBSD Stable:  freebsd14-5s, freebsd15-1s
         # FreeBSD Current: freebsd16-0c
         os: ${{ fromJson(needs.test-config.outputs.test_os) }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     env:
       # Setup outputs survive a selective matrix job rerun.
       REUSED_JOB: >-
@@ -203,7 +203,7 @@ jobs:
       github.repository != 'openzfs/zfs') &&
       always()
     name: Cleanup
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     needs: [ test-config, qemu-vm ]
 
     steps:

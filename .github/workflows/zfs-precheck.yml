@@ -40,7 +40,7 @@ jobs:
   detect:
     name: Detect
     if: github.event_name != 'push' || github.repository != 'openzfs/zfs'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     outputs:
       found: ${{ steps.detect.outputs.found }}
       labels: ${{ steps.detect.outputs.labels }}
@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         label: ${{ fromJson(needs.detect.outputs.labels) }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     env:
       OS: ${{ github.event.inputs.os || vars.FAILFIRST_OS || 'ubuntu24' }}
       ROLE: ${{ fromJson(needs.detect.outputs.jobs)[matrix.label].role }}
@@ -171,7 +171,7 @@ jobs:
     name: Verdict
     needs: [ detect, verify ]
     if: always() && needs.detect.result == 'success'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/download-artifact@v8
       if: needs.detect.outputs.found == 'true'
