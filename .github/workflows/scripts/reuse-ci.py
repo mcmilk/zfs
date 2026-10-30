@@ -11,18 +11,18 @@ import urllib.request
 
 
 WORKFLOWS = {
-    "zfs-qemu": ("zfs-qemu.yml", "ubuntu-24.04", None, {
+    "zfs-qemu": ("zfs-qemu.yml", "ubuntu-26.04", None, {
         "Setup QEMU", "Start build machine", "Install dependencies",
         "Build modules", "Setup testing machines", "Run tests", "Test Summary",
     }),
-    "zloop": ("zloop.yml", "ubuntu-24.04", "zloop", {
+    "zloop": ("zloop.yml", "ubuntu-26.04", "zloop", {
         "Install dependencies", "Autogen.sh", "Configure", "Make",
         "Install", "Tests",
     }),
-    "unit-tests": ("unit-tests.yml", "ubuntu-24.04", "unit-tests", {
+    "unit-tests": ("unit-tests.yml", "ubuntu-26.04", "unit-tests", {
         "Install dependencies", "Autogen", "Configure", "Unit tests",
     }),
-    "zfs-arm": ("zfs-arm.yml", "ubuntu-24.04-arm", "ZFS ARM build", {
+    "zfs-arm": ("zfs-arm.yml", "ubuntu-26.04-arm", "ZFS ARM build", {
         "Install dependencies", "Build modules",
     }),
     "checkstyle": ("checkstyle.yaml", "ubuntu-22.04", "checkstyle", {

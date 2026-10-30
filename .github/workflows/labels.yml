@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   open:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: ${{ github.event.action == 'opened' && github.event.pull_request.draft }}
     steps:
       - env:
@@ -19,7 +19,7 @@ jobs:
           gh pr edit $ISSUE --add-label "Status: Work in Progress"
 
   push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: ${{ github.event.action == 'synchronize' || github.event.action == 'reopened' }}
     steps:
       - env:
@@ -29,7 +29,7 @@ jobs:
           gh pr edit $ISSUE --remove-label "Status: Accepted,Status: Inactive,Status: Revision Needed,Status: Stale"
 
   draft:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: ${{ github.event.action == 'converted_to_draft' }}
     steps:
       - env:
@@ -39,7 +39,7 @@ jobs:
           gh pr edit $ISSUE --remove-label "Status: Accepted,Status: Code Review Needed,Status: Inactive,Status: Revision Needed,Status: Stale" --add-label "Status: Work in Progress"
 
   rfr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: ${{ github.event.action == 'ready_for_review' }}
     steps:
       - env:
