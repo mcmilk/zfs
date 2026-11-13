@@ -11,7 +11,7 @@ import urllib.request
 
 
 WORKFLOWS = {
-    "zfs-qemu": ("zfs-qemu.yml", "ubuntu-24.04", None, {
+    "zfs-qemu": ("zfs-qemu.yml", "ubuntu-26.04", None, {
         "Setup QEMU", "Start build machine", "Install dependencies",
         "Build modules", "Setup testing machines", "Run tests", "Test Summary",
     }),

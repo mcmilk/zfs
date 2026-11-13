@@ -129,7 +129,7 @@ jobs:
         # FreeBSD Stable:  freebsd14-5s, freebsd15-2s
         # FreeBSD Current: freebsd16-0c
         os: ${{ fromJson(needs.test-config.outputs.test_os) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       # Setup outputs survive a selective matrix job rerun.
       REUSED_JOB: >-
