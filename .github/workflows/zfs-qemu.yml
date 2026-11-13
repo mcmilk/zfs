@@ -26,7 +26,7 @@ jobs:
   test-config:
     name: Setup
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.repository != 'openzfs/zfs'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       actions: read
@@ -203,7 +203,7 @@ jobs:
       github.repository != 'openzfs/zfs') &&
       always()
     name: Cleanup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [ test-config, qemu-vm ]
 
     steps:
